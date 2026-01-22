@@ -8,24 +8,24 @@ namespace PRG2_ASSG
 {
     class FoodItem
     {
-        public string itemName { get; set; }
-        public string itemDesc { get; set; }
-        public double itemPrice { get; set; }
+        public string ItemName { get; set; }
+        public string ItemDesc { get; set; }
+        public double ItemPrice { get; set; }
         public string Customise { get; set; }
 
         public FoodItem() { } // default constructor 
 
-        public FoodItem(string iname, string id, double ip, string c)
+        public FoodItem(string iname, string id, double ip, string c) //parameterised constructor
         {
-            itemName = iname;
-            itemDesc = id;
-            itemPrice = ip;
+            ItemName = iname;
+            ItemDesc = id;
+            ItemPrice = ip;
             Customise = c;
         }
 
         public override string ToString()
         {
-            return $"{itemName}"    
+            return $"{ItemName}: {ItemDesc} - {ItemPrice}";
         }
 
     }
