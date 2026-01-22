@@ -35,7 +35,14 @@ namespace PRG2_ASSG
 
         public double CalculateOrderTotal()
         {
-            OrderTotal = 
+            double totalNoFee = 0;
+            double deliveryFee = 5;
+            foreach(var order in itemList)
+            {
+                totalNoFee += order.CalculateSubtotal();
+            }
+            OrderTotal = totalNoFee + deliveryFee;
+            return OrderTotal;
         }
         List<OrderedFoodItem> itemList { get; set; } = new List<OrderedFoodItem>();
         public void AddOrderedFoodItem(OrderedFoodItem item)
@@ -48,6 +55,11 @@ namespace PRG2_ASSG
             itemList.Remove(item);
             OrderPaid = true;
             return OrderPaid;
+
+        }
+
+        public void DisplayOrderedFoodItems()
+        {
 
         }
 
