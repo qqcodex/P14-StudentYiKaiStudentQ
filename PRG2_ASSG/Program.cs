@@ -1,10 +1,6 @@
-﻿namespace PRG2_ASSG
-{
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello, World!");
-        }
-    }
-}
+﻿//==========================================================
+// Student Number : S10272951
+// Student Name : Dg Muhammad Aqil Bin Md Alias
+// Partner Name : Tan Yi Kai
+//==========================================================
+
