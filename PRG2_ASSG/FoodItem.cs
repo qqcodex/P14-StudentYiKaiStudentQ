@@ -11,16 +11,14 @@ namespace PRG2_ASSG
         public string ItemName { get; set; }
         public string ItemDesc { get; set; }
         public double ItemPrice { get; set; }
-        public string Customise { get; set; }
 
         public FoodItem() { } // default constructor 
 
-        public FoodItem(string iname, string id, double ip, string c) //parameterised constructor
+        public FoodItem(string iname, string id, double ip) //parameterised constructor
         {
             ItemName = iname;
             ItemDesc = id;
             ItemPrice = ip;
-            Customise = c;
         }
 
         public override string ToString()

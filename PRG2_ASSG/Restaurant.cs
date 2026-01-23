@@ -12,7 +12,7 @@ namespace PRG2_ASSG
         public string restaurantName {  get; set; }
         public string restaurantEmail {  get; set; }
         
-        public List<Menu> menus = new List<Menu>(); 
+        public List<Menu> menuList = new List<Menu>(); 
         
         public Queue<Order> orderQueue = new Queue<Order>(); 
 
@@ -39,7 +39,7 @@ namespace PRG2_ASSG
 
         public void DisplayMenu() 
         {
-            foreach (var menu in menus)
+            foreach (var menu in menuList)
             {
                 menu.DisplayFoodItems();
             }
@@ -47,12 +47,12 @@ namespace PRG2_ASSG
 
         public void AddMenu(Menu menu) 
         { 
-            menus.Add(menu); 
+            menuList.Add(menu); 
         }
 
         public void RemoveMenu(Menu menu)
         {
-            menus.Remove(menu);
+            menuList.Remove(menu);
         }
 
         public override string ToString()

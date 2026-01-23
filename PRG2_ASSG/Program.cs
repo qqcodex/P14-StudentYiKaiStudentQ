@@ -9,25 +9,45 @@ using System.Numerics;
 
 //qn1 - Q
 List<Restaurant> restaurants = new List<Restaurant>();
+Dictionary<string, Restaurant> restaurantMap = new Dictionary<string, Restaurant>();
 void InitialiseRestaurant()
 {
-    List<string> csvList = File.ReadAllLines("restaurants.csv").ToList();
+    var lines = File.ReadAllLines("restaurants.csv");
 
-    for (int i = 1; i < csvList.Count; i++)
+    for (int i = 1; i < lines.Length; i++)
     {
-        string[] details = csvList[i].Split(',');
+        string[] details = lines[i].Split(',');
         string rid = details[0];
         string rn = details[1];
         string re = details[2];
 
         Restaurant r = new Restaurant(rid, rn, re);
         restaurants.Add(r);
+        restaurantMap.Add(rid, r);
+    }
+}
+InitialiseRestaurant();
+
+void InitialiseFoodItem()
+{
+    var lines = File.ReadAllLines("fooditems.csv");
+
+    for (int i = 1; i < lines.Length; i++)
+    {
+        string[] details = lines[i].Split(',');
+        string rid = details[0];
+        string iname = details[1];
+        string idesc = details[2];
+        double iprice = Convert.ToDouble(details[3]);
+
+        FoodItem fi = new FoodItem(iname, idesc, iprice);
+        Restaurant r = restaurantMap[rid]; //link fooditem to restaurant
+
+        r.menuList[0].AddFoodItem(fi);
     }
 }
 
-InitialiseRestaurant();
-Console.WriteLine(restaurants.Count);
-
+InitialiseFoodItem();
 
 //qn4 - Q 
 
