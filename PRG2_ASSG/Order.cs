@@ -17,7 +17,7 @@ namespace PRG2_ASSG
         public string OrderPaymentMethod { get; set; }
         public bool OrderPaid { get; set; }
 
-        public Order() //defualt constructor 
+        public Order() //default constructor 
         {
         } 
 

@@ -13,11 +13,10 @@ namespace PRG2_ASSG
         
         public List<FoodItem> foodItemList = new List<FoodItem>();
 
-        public Menu(string menuId, string menuName, List<FoodItem> foodItemList)
+        public Menu(string menuId, string menuName)
         {
             this.menuId = menuId;
             this.menuName = menuName;
-            this.foodItemList = foodItemList;
         }
 
         public void AddFoodItem(FoodItem item) { foodItemList.Add(item); }

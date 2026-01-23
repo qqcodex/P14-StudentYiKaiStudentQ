@@ -15,18 +15,17 @@ namespace PRG2_ASSG
 
         public Customer() { }
 
-        public Customer(string emailAddress, string customerName, List<Order> orderList)
+        public Customer(string emailAddress, string customerName)
         {
             this.emailAddress = emailAddress;
             this.customerName = customerName;
-            this.orderList = orderList;
         }
 
         public void AddOrder(Order order) 
         { 
             orderList.Add(order); 
         } 
-        public void DisplayAllOrders(Order order)
+        public void DisplayAllOrders()
         {
             foreach (Order item in orderList)
             {

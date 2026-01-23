@@ -11,7 +11,7 @@ namespace PRG2_ASSG
         public int QtyOrdered { get; set; }
         public double SubTotal { get; set; }
         public OrderedFoodItem() : base() { } // defualt constructor
-        public OrderedFoodItem(string iname, string id, double ip, string c,int qo,double st) : base(iname,id,ip,c) //parameterised constructor
+        public OrderedFoodItem(string iname, string id, double ip, string c,int qo,double st) : base(iname,id,ip) //parameterised constructor
         {
             QtyOrdered = qo;
             SubTotal = st;

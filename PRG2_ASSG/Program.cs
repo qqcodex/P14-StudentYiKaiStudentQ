@@ -6,7 +6,22 @@
 
 using PRG2_ASSG;
 using System.Numerics;
+void Main()
+{
+    InitialiseRestaurant();
+    InitialiseFoodItem();
+    InitialiseCustomer();
+    InitialiseOrders();
 
+    Console.Write("Welcome to the Gruberoo Food Delivery System");
+    Console.WriteLine($"{restaurants.Count} restaurants loaded!");
+    Console.WriteLine($"{.Count} food items loaded!");
+    Console.WriteLine($"{restaurants.Count} customers loaded!");
+    Console.WriteLine($"{.Count} orders loaded!\n");
+    
+
+
+}
 //qn1 - Q
 
 List<Restaurant> restaurants = new List<Restaurant>();
@@ -23,6 +38,7 @@ void InitialiseRestaurant()
         string re = details[2];
 
         Restaurant r = new Restaurant(rid, rn, re);
+        r.AddMenu(new Menu("M001", "Main Menu"));
         restaurants.Add(r);
         restaurantMap.Add(rid, r);
     }
@@ -38,8 +54,8 @@ void InitialiseFoodItem()
         string[] details = lines[i].Split(',');
         string rid = details[0];
         string iname = details[1];
-        string idesc = details[2];
-        double iprice = Convert.ToDouble(details[3]);
+        string idesc = string.Join(",", details.Skip(2).Take(details.Length - 3));
+        double iprice = Convert.ToDouble(details[details.Length - 1]);
 
         FoodItem fi = new FoodItem(iname, idesc, iprice);
         Restaurant r = restaurantMap[rid]; //link fooditem to restaurant
@@ -48,16 +64,41 @@ void InitialiseFoodItem()
     }
 }
  
-InitialiseFoodItem(); 
+InitialiseFoodItem();
 
 //qn4 - Q 
-Console.Write("All Orders\n==========");
-Console.WriteLine("{0,-10}{1,-11}{2,-19}{3,-7}{4,-9}", "Order ID", "Customer", "Restaurant", "Delivery Date/Time", "Amount", "Status");
+void DisplayALLOrders()
+{
+    Console.Write("All Orders\n");
+    Console.WriteLine("==========");
+    Console.WriteLine("{0,-12}{1,-12}{2,-16}{3,-22}{4,-9}{5,-9}", "Order ID", "Customer", "Restaurant", "Delivery Date/Time", "Amount", "Status");
+    Console.WriteLine("{0,-12}{1,-12}{2,-16}{3,-22}{4,-9}{5,-9}", "--------", "----------", "-------------", "------------------", "------", "---------");
+
+    foreach (Customer c in customers)
+    {
+        foreach (Order o in c.orderList)
+        {
+            Restaurant r =
+        }
+
+    }
+}
 
 //qn6 - Q
 
 //qn8 - Q 
+void DeleteOrder()
+{
+    Console.Write("Delete Order\n");
+    Console.WriteLine("============");
+    Console.WriteLine("Enter Customer Email: ");
+    string email = Console.ReadLine();
+    Console.WriteLine("Pending orders: ");
 
+    Console.WriteLine("Enter Order ID: ");
+    int orderID = Convert.ToInt32(Console.ReadLine());
+
+}
 
 //qn2 - Yi Kai
 
