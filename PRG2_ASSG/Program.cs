@@ -8,6 +8,7 @@ using PRG2_ASSG;
 using System.Numerics;
 
 //qn1 - Q
+
 List<Restaurant> restaurants = new List<Restaurant>();
 Dictionary<string, Restaurant> restaurantMap = new Dictionary<string, Restaurant>();
 void InitialiseRestaurant()
@@ -46,10 +47,12 @@ void InitialiseFoodItem()
         r.menuList[0].AddFoodItem(fi);
     }
 }
-
-InitialiseFoodItem();
+ 
+InitialiseFoodItem(); 
 
 //qn4 - Q 
+Console.Write("All Orders\n==========");
+Console.WriteLine("{0,-10}{1,-11}{2,-19}{3,-7}{4,-9}", "Order ID", "Customer", "Restaurant", "Delivery Date/Time", "Amount", "Status");
 
 //qn6 - Q
 
