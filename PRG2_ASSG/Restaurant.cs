@@ -16,6 +16,14 @@ namespace PRG2_ASSG
         
         public Queue<Order> orderQueue = new Queue<Order>(); 
 
+        public Restaurant() { } //default constructor 
+
+        public Restaurant(string rid,string rn,string re) // parameterized constructor
+        {
+            restaurantId = rid;
+            restaurantName = rn;
+            restaurantEmail = re;
+        }
         public void DisplayOrders(Order order)
         {
             foreach (var menu in orderQueue)
@@ -31,7 +39,10 @@ namespace PRG2_ASSG
 
         public void DisplayMenu() 
         {
-            foreach (var menu in menus) menu.DisplayFoodItems();
+            foreach (var menu in menus)
+            {
+                menu.DisplayFoodItems();
+            }
         }
 
         public void AddMenu(Menu menu) 

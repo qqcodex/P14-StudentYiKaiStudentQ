@@ -26,7 +26,10 @@ namespace PRG2_ASSG
 
         public void DisplayFoodItems()
         {
-            foreach (var item in foodItemList) Console.WriteLine(item.ToString());
+            foreach (var item in foodItemList)
+            {
+                Console.WriteLine(item.ToString());
+            }
         }
 
         public override string ToString()
