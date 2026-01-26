@@ -74,7 +74,7 @@ void DisplayRestaurantOrders()
     Console.WriteLine("{0,-12}{1,-12}{2,-16}{3,-22}{4,-9}{5,-9}", "Order ID", "Customer", "Restaurant", "Delivery Date/Time", "Amount", "Status");
     Console.WriteLine("{0,-12}{1,-12}{2,-16}{3,-22}{4,-9}{5,-9}", "--------", "----------", "-------------", "------------------", "------", "---------");
 
-    foreach (Customer c in customers)
+    foreach (Customer c in customerlist)
     {
         foreach (Order o in c.orderList)
         {
@@ -94,10 +94,12 @@ void ProcessOrder()
 
     while (orderQueue.Count > 0)
     {
+       
+        Order current = orderQueue.Peek();
         DisplayOrderedFoodItems();
-        Console.WriteLine($"Delivery date/time: {.Order.DeliveryDateTime}");
-        Console.WriteLine($"Total Amount: {.Order.OrderTotal:F2}");
-        Console.WriteLine($"Order Status: {.Order.OrderStatus}");
+        Console.WriteLine($"Delivery date/time: {current.DeliveryDateTime}");
+        Console.WriteLine($"Total Amount: ${current.OrderTotal:F2}");
+        Console.WriteLine($"Order Status: {current.OrderStatus}");
     }
 
 
@@ -149,7 +151,7 @@ void InitialiseOrders()
     for (int i = 1; i < lines.Length; i++)
     {
         string[] data = lines[i].Split(',');
-
+        
         int orderId = Convert.ToInt32(data[0]);
         string custEmail = data[1];
         string restId = data[2];
@@ -161,9 +163,8 @@ void InitialiseOrders()
         double orderTotal = Convert.ToDouble(data[7]);
         string orderStatus = data[8];
         string items = data[9];
-        string orderPaymentMethod = data[10];
 
-        Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr, orderPaymentMethod);
+        Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr); // No bool orderPaid object 
         foreach (Customer customer in customerlist)
         {
             if (custEmail == customer.emailAddress)
@@ -171,11 +172,11 @@ void InitialiseOrders()
                 customer.orderList.Add(o);
             }
         }
-        foreach (string id in restaurantMap.Keys)
+        foreach (string id in restaurantMap.Keys )
         {
-            if (restId == id)
+            if (restId ==  id)
             {
-                restaurantMap[id].orderQueue.Enqueue(o);
+                restaurantMap[id].orderQueue.Enqueue( o );
             }
         }
     }

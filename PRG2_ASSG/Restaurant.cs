@@ -24,7 +24,7 @@ namespace PRG2_ASSG
             restaurantName = rn;
             restaurantEmail = re;
         }
-        public void DisplayOrders(Order order)
+        public void DisplayOrders()
         {
             foreach (var menu in orderQueue)
             {
