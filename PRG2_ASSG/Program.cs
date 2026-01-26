@@ -124,9 +124,78 @@ void DeleteOrder()
 }
 
 //qn2 - Yi Kai
+List<Customer> customerlist = new List<Customer>();
+void InitialiseCustomer()
+{
+    var lines = File.ReadAllLines("customers.csv");
 
+    for (int i = 1; i < lines.Length; i++)
+    {
+        string[] data = lines[i].Split(',');
+        string email = data[0];
+        string name = data[1];
+
+        Customer c = new Customer(email, name);
+        customerlist.Add(c);
+    }
+}
+
+//int oi, DateTime odt,double ot,string os, DateTime ddt,string da, string opm
+
+void InitialiseOrders()
+{
+    var lines = File.ReadAllLines("orders.csv");
+
+    for (int i = 1; i < lines.Length; i++)
+    {
+        string[] data = lines[i].Split(',');
+
+        int orderId = Convert.ToInt32(data[0]);
+        string custEmail = data[1];
+        string restId = data[2];
+        string delivDate = data[3];
+        string delivTime = data[4];
+        DateTime delivDateTime = Convert.ToDateTime(delivDate + " " + delivTime);
+        string delivAddr = data[5];
+        DateTime createdDateTime = Convert.ToDateTime(data[6]);
+        double orderTotal = Convert.ToDouble(data[7]);
+        string orderStatus = data[8];
+        string items = data[9];
+
+        Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr); // No bool orderPaid object 
+        foreach (Customer customer in customerlist)
+        {
+            if (custEmail == customer.emailAddress)
+            {
+                customer.orderList.Add(o);
+            }
+        }
+        foreach (string id in restaurantMap.Keys)
+        {
+            if (restId == id)
+            {
+                restaurantMap[id].orderQueue.Enqueue(o);
+            }
+        }
+    }
+}
 //qn3 - Yi Kai
-
+void DisplayRestaurantMenuItem()
+{
+    Console.WriteLine("All Restaurants and Menu Items");
+    Console.WriteLine("==============================");
+    foreach (Restaurant restaurant in restaurants)
+    {
+        Console.WriteLine($"Restaurant: {restaurant.restaurantName} ({restaurant.restaurantId})");
+        foreach (Menu menu in restaurant.menuList)
+        {
+            foreach (FoodItem foodItem in menu.foodItemList)
+            {
+                Console.WriteLine($"- {foodItem.ItemName}: {foodItem.ItemDesc} - ${foodItem.ItemPrice}");
+            }
+        }
+    }
+}
 //qn5 - Yi Kai
 
 //qn7 - Yi Kai
