@@ -149,7 +149,7 @@ void InitialiseOrders()
     for (int i = 1; i < lines.Length; i++)
     {
         string[] data = lines[i].Split(',');
-        
+
         int orderId = Convert.ToInt32(data[0]);
         string custEmail = data[1];
         string restId = data[2];
@@ -161,8 +161,9 @@ void InitialiseOrders()
         double orderTotal = Convert.ToDouble(data[7]);
         string orderStatus = data[8];
         string items = data[9];
+        string orderPaymentMethod = data[10];
 
-        Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr); // No bool orderPaid object 
+        Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr, orderPaymentMethod);
         foreach (Customer customer in customerlist)
         {
             if (custEmail == customer.emailAddress)
@@ -170,11 +171,11 @@ void InitialiseOrders()
                 customer.orderList.Add(o);
             }
         }
-        foreach (string id in restaurantMap.Keys )
+        foreach (string id in restaurantMap.Keys)
         {
-            if (restId ==  id)
+            if (restId == id)
             {
-                restaurantMap[id].orderQueue.Enqueue( o );
+                restaurantMap[id].orderQueue.Enqueue(o);
             }
         }
     }
