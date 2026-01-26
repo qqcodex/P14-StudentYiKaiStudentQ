@@ -190,14 +190,26 @@ void DisplayRestaurantMenuItem()
         Console.WriteLine($"Restaurant: {restaurant.restaurantName} ({restaurant.restaurantId})");
         foreach (Menu menu in restaurant.menuList)
         {
-            foreach(FoodItem foodItem in menu.foodItemList)
-            {
-                Console.WriteLine($"- {foodItem.ItemName}: {foodItem.ItemDesc} - ${foodItem.ItemPrice}");
-            }
+            menu.DisplayFoodItems();
         }
     }
 }
 
 //qn5 - Yi Kai
+void CreateNewOrder()
+{
+    Console.WriteLine("Create New Order");
+    Console.WriteLine("================");
+    Console.WriteLine("Enter Customer Email: ");
+    string custEmail = Console.ReadLine();
+    Console.WriteLine("Enter Restaurent ID: ");
+    string restaurantId = Console.ReadLine();
+    Console.WriteLine("Enter Delivery Date (dd/mm/yyyy): ");
+    string delivDate = Console.ReadLine();
+    Console.WriteLine("Enter Delivery Time (hh:mm): ")
+    string delivTime = Console.ReadLine();
+    date
+    
 
+}
 //qn7 - Yi Kai

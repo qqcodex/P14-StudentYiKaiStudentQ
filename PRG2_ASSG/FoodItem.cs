@@ -23,7 +23,7 @@ namespace PRG2_ASSG
 
         public override string ToString()
         {
-            return $"{ItemName}: {ItemDesc} - {ItemPrice}";
+            return $"- {ItemName}: {ItemDesc} - ${ItemPrice}";
         }
 
     }

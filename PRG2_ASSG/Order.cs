@@ -66,6 +66,12 @@ namespace PRG2_ASSG
                 Console.Write($"{i+1}. {itemList[i].ItemName} - {itemList[i].QtyOrdered}");
             }
         }
+        OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,CreatedDateTime,TotalAmount,Status,Items,PaymentMethod
+
+        public override string ToString()
+        {
+            return $"OrderId: {OrderId}  CustEmail: {customeremai}";
+        }
 
     }
 }

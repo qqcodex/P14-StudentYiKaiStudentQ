@@ -19,9 +19,15 @@ namespace PRG2_ASSG
             this.menuName = menuName;
         }
 
-        public void AddFoodItem(FoodItem item) { foodItemList.Add(item); }
+        public void AddFoodItem(FoodItem item) 
+        { 
+            foodItemList.Add(item); 
+        }
         
-        public bool RemoveFoodItem(FoodItem item) { return foodItemList.Remove(item); }
+        public bool RemoveFoodItem(FoodItem item) 
+        { 
+            return foodItemList.Remove(item); 
+        }
 
         public void DisplayFoodItems()
         {
