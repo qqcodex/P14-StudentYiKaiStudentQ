@@ -24,7 +24,7 @@ void Main()
 }
 //qn1 - Q
 
-List<Restaurant> restaurants = new List<Restaurant>();
+List<Restaurant> restaurantlist = new List<Restaurant>();
 Dictionary<string, Restaurant> restaurantMap = new Dictionary<string, Restaurant>();
 void InitialiseRestaurant()
 {
@@ -39,7 +39,7 @@ void InitialiseRestaurant()
 
         Restaurant r = new Restaurant(rid, rn, re);
         r.AddMenu(new Menu("M001", "Main Menu"));
-        restaurants.Add(r);
+        restaurantlist.Add(r);
         restaurantMap.Add(rid, r);
     }
 }
@@ -92,15 +92,23 @@ void ProcessOrder()
     Console.WriteLine("Enter Restaurant ID: ");
     string rId = Console.ReadLine();
 
-    while (orderQueue.Count > 0)
+    foreach (var r in restaurantlist)
     {
-       
-        Order current = orderQueue.Peek();
-        DisplayOrderedFoodItems();
-        Console.WriteLine($"Delivery date/time: {current.DeliveryDateTime}");
-        Console.WriteLine($"Total Amount: ${current.OrderTotal:F2}");
-        Console.WriteLine($"Order Status: {current.OrderStatus}");
+        if (r.restaurantId == rId)
+        {
+            while (r.orderQueue.Count > 0)
+            {
+
+                Order current = r.orderQueue.Peek();
+                current.DisplayOrderedFoodItems();
+                Console.WriteLine($"Delivery date/time: {current.DeliveryDateTime}");
+                Console.WriteLine($"Total Amount: ${current.OrderTotal:F2}");
+                Console.WriteLine($"Order Status: {current.OrderStatus}");
+            }
+        }
     }
+
+
 
 
     Console.WriteLine("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
@@ -117,8 +125,10 @@ void DeleteOrder()
     Console.Write("Delete Order\n");
     Console.WriteLine("============");
     Console.WriteLine("Enter Customer Email: ");
-    string email = Console.ReadLine();
+    string custEmail = Console.ReadLine();
     Console.WriteLine("Pending orders: ");
+    custEmail.Order.OrderID;
+
 
     Console.WriteLine("Enter Order ID: ");
     int orderID = Convert.ToInt32(Console.ReadLine());
