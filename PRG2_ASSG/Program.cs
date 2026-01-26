@@ -94,7 +94,11 @@ void ProcessOrder()
 
     foreach (var r in restaurantlist)
     {
-        if (r.restaurantId == rId)
+        if (r.restaurantEmail != rId)
+        {
+            continue;
+        }
+        else if (r.restaurantId == rId)
         {
             while (r.orderQueue.Count > 0)
             {
@@ -103,21 +107,42 @@ void ProcessOrder()
                 current.DisplayOrderedFoodItems();
                 Console.WriteLine($"Delivery date/time: {current.DeliveryDateTime}");
                 Console.WriteLine($"Total Amount: ${current.OrderTotal:F2}");
-                Console.WriteLine($"Order Status: {current.OrderStatus}");
+                Console.WriteLine($"Order Status: {current.OrderStatus}\n");
+
+
+                Console.WriteLine("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
+                string option = Console.ReadLine();
+                if (option == "C")
+                {
+                    if (current.OrderStatus == "Pending")
+                    {
+                        current.OrderStatus = "Preparing";
+                    }
+                }
+                if (option == "R")
+                {
+                    if (current.OrderStatus == "Pending")
+                    {
+                        current.OrderStatus = "Refund";
+                    }
+                }
+                if (option == "S")
+                {
+                    if (current.OrderStatus == "Pending")
+                    {
+                        current.OrderStatus = "Preparing";
+                    }
+                }
+                if (option == "D")
+                {
+                    if (current.OrderStatus == "Preparing")
+                    {
+                        current.OrderStatus = "Delivered";
+                    }
+                }
             }
         }
     }
-
-
-
-
-    Console.WriteLine("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
-    string option = Console.ReadLine();
-    if (option == "C")
-    {
-
-    }
-
 }
 //qn8 - Q 
 void DeleteOrder()
