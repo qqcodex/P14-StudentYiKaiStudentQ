@@ -196,7 +196,7 @@ void DisplayRestaurantMenuItem()
 {
     Console.WriteLine("All Restaurants and Menu Items");
     Console.WriteLine("==============================");
-    foreach (Restaurant restaurant in restaurants)
+    foreach (Restaurant restaurant in restaurantlist)
     {
         Console.WriteLine($"Restaurant: {restaurant.restaurantName} ({restaurant.restaurantId})");
         foreach (Menu menu in restaurant.menuList)
@@ -217,10 +217,22 @@ void CreateNewOrder()
     string restaurantId = Console.ReadLine();
     Console.WriteLine("Enter Delivery Date (dd/mm/yyyy): ");
     string delivDate = Console.ReadLine();
-    Console.WriteLine("Enter Delivery Time (hh:mm): ")
+    Console.WriteLine("Enter Delivery Time (hh:mm): ");
     string delivTime = Console.ReadLine();
-    date
-    
+    DateTime delivDateTime = Convert.ToDateTime(delivDate + " " + delivTime);
+    Console.WriteLine("Enter Delivery Address: ");
+    string delivAddr = Console.ReadLine();
+
+    foreach (Restaurant r in restaurantlist)
+    {
+        if (restaurantId == r.restaurantId)
+        {
+            foreach(Menu m in  r.menuList)
+            {
+                Console.WriteLine();
+            }
+        }
+    }
 
 }
 //qn7 - Yi Kai
