@@ -124,7 +124,7 @@ void DeleteOrder()
 }
 
 //qn2 - Yi Kai
-List<Customer> customerlist = new List<Customer>();
+List <Customer> customerlist = new List<Customer>();    
 void InitialiseCustomer()
 {
     var lines = File.ReadAllLines("customers.csv");
@@ -149,7 +149,7 @@ void InitialiseOrders()
     for (int i = 1; i < lines.Length; i++)
     {
         string[] data = lines[i].Split(',');
-
+        
         int orderId = Convert.ToInt32(data[0]);
         string custEmail = data[1];
         string restId = data[2];
@@ -170,11 +170,11 @@ void InitialiseOrders()
                 customer.orderList.Add(o);
             }
         }
-        foreach (string id in restaurantMap.Keys)
+        foreach (string id in restaurantMap.Keys )
         {
-            if (restId == id)
+            if (restId ==  id)
             {
-                restaurantMap[id].orderQueue.Enqueue(o);
+                restaurantMap[id].orderQueue.Enqueue( o );
             }
         }
     }
@@ -189,13 +189,14 @@ void DisplayRestaurantMenuItem()
         Console.WriteLine($"Restaurant: {restaurant.restaurantName} ({restaurant.restaurantId})");
         foreach (Menu menu in restaurant.menuList)
         {
-            foreach (FoodItem foodItem in menu.foodItemList)
+            foreach(FoodItem foodItem in menu.foodItemList)
             {
                 Console.WriteLine($"- {foodItem.ItemName}: {foodItem.ItemDesc} - ${foodItem.ItemPrice}");
             }
         }
     }
 }
+
 //qn5 - Yi Kai
 
 //qn7 - Yi Kai
