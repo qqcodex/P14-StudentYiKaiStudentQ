@@ -67,7 +67,7 @@ void InitialiseFoodItem()
 InitialiseFoodItem();
 
 //qn4 - Q 
-void DisplayALLOrders()
+void DisplayRestaurantOrders()
 {
     Console.Write("All Orders\n");
     Console.WriteLine("==========");
@@ -92,7 +92,7 @@ void ProcessOrder()
     Console.WriteLine("Enter Restaurant ID: ");
     string rId = Console.ReadLine();
 
-    while (restaurants.orderQueue.Count > 0)
+    while (orderQueue.Count > 0)
     {
         DisplayOrderedFoodItems();
         Console.WriteLine($"Delivery date/time: {.Order.DeliveryDateTime}");
