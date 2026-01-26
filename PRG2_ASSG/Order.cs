@@ -60,7 +60,11 @@ namespace PRG2_ASSG
 
         public void DisplayOrderedFoodItems()
         {
-
+            Console.Write("Ordered Items:\n");
+            for (int i = 0; i < itemList.Count; i++)
+            { 
+                Console.Write($"{i+1}. {itemList[i].ItemName} - {itemList[i].QtyOrdered}");
+            }
         }
 
     }

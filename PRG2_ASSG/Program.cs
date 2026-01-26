@@ -54,7 +54,7 @@ void InitialiseFoodItem()
         string[] details = lines[i].Split(',');
         string rid = details[0];
         string iname = details[1];
-        string idesc = string.Join(",", details.Skip(2).Take(details.Length - 3));
+        string idesc = details[2];
         double iprice = Convert.ToDouble(details[details.Length - 1]);
 
         FoodItem fi = new FoodItem(iname, idesc, iprice);
@@ -85,7 +85,30 @@ void DisplayALLOrders()
 }
 
 //qn6 - Q
+void ProcessOrder()
+{
+    Console.Write("Process Order\n");
+    Console.WriteLine("=============");
+    Console.WriteLine("Enter Restaurant ID: ");
+    string rId = Console.ReadLine();
 
+    while (restaurants.orderQueue.Count > 0)
+    {
+        DisplayOrderedFoodItems();
+        Console.WriteLine($"Delivery date/time: {.Order.DeliveryDateTime}");
+        Console.WriteLine($"Total Amount: {.Order.OrderTotal:F2}");
+        Console.WriteLine($"Order Status: {.Order.OrderStatus}");
+    }
+
+
+    Console.WriteLine("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
+    string option = Console.ReadLine();
+    if (option == "C")
+    {
+
+    }
+
+}
 //qn8 - Q 
 void DeleteOrder()
 {
