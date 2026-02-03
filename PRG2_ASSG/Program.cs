@@ -52,14 +52,19 @@ void InitialiseFoodItem()
     for (int i = 1; i < lines.Length; i++)
     {
         string[] details = lines[i].Split(',');
+
         string rid = details[0];
         string iname = details[1];
         string idesc = details[2];
-        double iprice = Convert.ToDouble(details[details.Length - 1]);
+        double iprice = Convert.ToDouble(details[3]);
 
+        string[] dishElements= idesc.Split(';');
+        for (int j = 0; j < dishElements.Length; j++)
+            dishElements[j] = dishElements[j].Trim();
+ 
         FoodItem fi = new FoodItem(iname, idesc, iprice);
-        Restaurant r = restaurantMap[rid]; //link fooditem to restaurant
 
+        Restaurant r = restaurantMap[rid]; //link fooditem to restaurant
         r.menuList[0].AddFoodItem(fi);
     }
 }

@@ -11,12 +11,6 @@
     <None Update="customers.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="fooditems.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="orders.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="restaurants.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
