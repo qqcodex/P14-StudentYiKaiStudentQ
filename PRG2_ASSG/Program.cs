@@ -164,7 +164,6 @@ void InitialiseCustomer()
 void InitialiseOrders()
 {
     var lines = File.ReadAllLines("orders.csv");
-
     for (int i = 1; i < lines.Length; i++)
     {
         string[] data = lines[i].Split(',');
@@ -174,9 +173,14 @@ void InitialiseOrders()
         string restId = data[2];
         string delivDate = data[3];
         string delivTime = data[4];
-        DateTime delivDateTime = Convert.ToDateTime(delivDate + " " + delivTime);
+
+        string combinedDeliv = delivDate + " " + delivTime;
+        DateTime delivDateTime = DateTime.ParseExact(combinedDeliv, "d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
         string delivAddr = data[5];
-        DateTime createdDateTime = Convert.ToDateTime(data[6]);
+        
+        string createdDateTimestr = data[6];
+        DateTime createdDateTime = DateTime.ParseExact(createdDateTimestr, "d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture); //convert from "M/d/yyyy HH:mm" to datetime data type
+
         double orderTotal = Convert.ToDouble(data[7]);
         string orderStatus = data[8];
         string items = data[9];
