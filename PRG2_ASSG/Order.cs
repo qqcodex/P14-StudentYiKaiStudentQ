@@ -44,7 +44,7 @@ namespace PRG2_ASSG
             OrderTotal = totalNoFee + deliveryFee;
             return OrderTotal;
         }
-        List<OrderedFoodItem> itemList { get; set; } = new List<OrderedFoodItem>();
+        public List<OrderedFoodItem> itemList { get; set; } = new List<OrderedFoodItem>();
         public void AddOrderedFoodItem(OrderedFoodItem item)
         {
             itemList.Add(item);
@@ -52,25 +52,20 @@ namespace PRG2_ASSG
 
         public bool RemoveOrderedFoodItem(OrderedFoodItem item)
         {
-            itemList.Remove(item);
-            OrderPaid = true;
-            return OrderPaid;
-
+            return itemList.Remove(item);
         }
 
         public void DisplayOrderedFoodItems()
         {
-            Console.Write("Ordered Items:\n");
+            Console.WriteLine("Ordered Items:");
             for (int i = 0; i < itemList.Count; i++)
-            { 
-                Console.Write($"{i+1}. {itemList[i].ItemName} - {itemList[i].QtyOrdered}");
-            }
+                Console.WriteLine($"{i + 1}. {itemList[i].ItemName} x{itemList[i].QtyOrdered}");
         }
-        OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,CreatedDateTime,TotalAmount,Status,Items,PaymentMethod
+
 
         public override string ToString()
         {
-            return $"OrderId: {OrderId}  CustEmail: {customeremai}";
+            return $"OrderID: {OrderId}  Total: ${OrderTotal:F2}  Status: {OrderStatus}";
         }
 
     }

@@ -9,17 +9,15 @@ namespace PRG2_ASSG
     internal class OrderedFoodItem : FoodItem
     {
         public int QtyOrdered { get; set; }
-        public double SubTotal { get; set; }
         public OrderedFoodItem() : base() { } // default constructor
-        public OrderedFoodItem(string iname, string id, double ip, string c,int qo,double st) : base(iname,id,ip) //parameterised constructor
+        public OrderedFoodItem(string iname, string id, double ip,int qo) : base(iname,id,ip) //parameterised constructor
         {
             QtyOrdered = qo;
-            SubTotal = st;
         }
 
         public double CalculateSubtotal()
         {
-            SubTotal = QtyOrdered * ItemPrice;
+            double SubTotal = QtyOrdered * ItemPrice;
             return SubTotal;
         }
 

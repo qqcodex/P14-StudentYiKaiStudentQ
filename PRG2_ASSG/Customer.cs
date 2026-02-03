@@ -35,11 +35,11 @@ namespace PRG2_ASSG
 
         public bool RemoveOrder(Order order)
         {
-            foreach (Order item in orderList)
+            for (int i = 0; i < orderList.Count; i++)
             {
-                if (order.Equals(item))
+                if (orderList[i].OrderId == order.OrderId)
                 {
-                    orderList.Remove(item);
+                    orderList.RemoveAt(i);
                     return true;
                 }
             }

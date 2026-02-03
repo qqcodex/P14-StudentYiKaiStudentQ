@@ -28,7 +28,7 @@ namespace PRG2_ASSG
         {
             foreach (Order order in orderQueue)
             {
-                Console.WriteLine(order.ToString);
+                Console.WriteLine(order.ToString());
             }
         }
         

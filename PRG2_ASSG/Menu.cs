@@ -9,7 +9,7 @@ namespace PRG2_ASSG
     internal class Menu
     {
         public string menuId {  get; set; } 
-        private string menuName { get; set; }
+        public string menuName { get; set; }
         
         public List<FoodItem> foodItemList = new List<FoodItem>();
 
