@@ -7,9 +7,11 @@
 using PRG2_ASSG;
 using System.Numerics;
 List<Restaurant> restaurantlist = new List<Restaurant>();
-Dictionary<string, Restaurant> RestaurantMap = new Dictionary<string, Restaurant>();
+Dictionary<string, Restaurant> RestaurantMap = new Dictionary<string, Restaurant>(); //where string is restID
 
 List<Customer> customerlist = new List<Customer>();
+Dictionary<int, Customer> orderCustomerMap = new Dictionary<int, Customer>();
+
 
 Dictionary<int, Restaurant> orderRestaurantMap = new Dictionary<int, Restaurant>();
 
@@ -30,6 +32,8 @@ Console.WriteLine($"{restaurantlist.Count} restaurants loaded!");
 Console.WriteLine($"{foodItemCount} food items loaded!");
 Console.WriteLine($"{customerlist.Count} customers loaded!");
 Console.WriteLine($"{orderCount} orders loaded!\n");
+
+
 
 // -----------------------------MAIN MENU-----------------------------
 
@@ -169,7 +173,7 @@ void InitialiseOrders()
         string[] data = lines[i].Split(',');
 
         int orderId = Convert.ToInt32(data[0]);
-        string custEmail = data[1];
+        string custEmail = data[1].Trim().ToLower(); 
         string restId = data[2];
         string delivDate = data[3];
         string delivTime = data[4];
@@ -183,20 +187,31 @@ void InitialiseOrders()
 
         double orderTotal = Convert.ToDouble(data[7]);
         string orderStatus = data[8];
-        string items = data[9];
+
         string paymentMethod = data[10];
 
         Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr, paymentMethod); // No bool orderPaid object 
         orderCount++;
+
+        string items = data[9];
+
+        Customer matchedCustomer = null;
 
         foreach (Customer customer in customerlist)
         {
             if (custEmail == customer.emailAddress)
             {
                 customer.orderList.Add(o);
+                matchedCustomer = customer;
                 break;
             }
         }
+
+        if (matchedCustomer != null)
+        {
+            orderCustomerMap[orderId] = matchedCustomer;
+        }
+
         Restaurant r = RestaurantMap[restId];
         r.orderQueue.Enqueue(o);
 
@@ -216,6 +231,7 @@ void DisplayRestaurantMenuItem()
         foreach (Menu menu in restaurant.menuList)
         {
             menu.DisplayFoodItems();
+            Console.WriteLine();
         }
     }
 }
@@ -239,8 +255,7 @@ void DisplayAllOrders()
                 r.restaurantName,
                 o.DeliveryDateTime.ToString("dd/MM/yyyy HH:mm"),
                 $"${o.OrderTotal:F2}",
-                o.OrderStatus
-            );
+                o.OrderStatus);
         }
     }
 }
@@ -279,7 +294,7 @@ void ProcessOrder()
 {
     Console.Write("Process Order\n");
     Console.WriteLine("=============");
-    Console.WriteLine("Enter Restaurant ID: ");
+    Console.Write("Enter Restaurant ID: ");
     string rId = Console.ReadLine();
 
     foreach (var r in restaurantlist)
@@ -292,15 +307,25 @@ void ProcessOrder()
         {
             while (r.orderQueue.Count > 0)
             {
-
                 Order current = r.orderQueue.Peek();
+                // 3) print like sample
+                Console.WriteLine();
+                Console.WriteLine($"Order {current.OrderId}:");
+
+                // Get customer from map (no need to search)
+                string custName = "Unknown";
+                if (orderCustomerMap.ContainsKey(current.OrderId))
+                {
+                    custName = orderCustomerMap[current.OrderId].customerName;
+                }
+                Console.WriteLine($"Customer: {custName}");
                 current.DisplayOrderedFoodItems();
                 Console.WriteLine($"Delivery date/time: {current.DeliveryDateTime}");
                 Console.WriteLine($"Total Amount: ${current.OrderTotal:F2}");
                 Console.WriteLine($"Order Status: {current.OrderStatus}\n");
 
 
-                Console.WriteLine("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
+                Console.Write("[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
                 string option = Console.ReadLine();
                 try
                 {
@@ -311,7 +336,7 @@ void ProcessOrder()
                             current.OrderStatus = "Preparing";
                             r.orderQueue.Dequeue();      // remove from queue after action
                             r.orderQueue.Enqueue(current); // put back so it can be delivered later
-                            Console.WriteLine("Order confirmed. Status updated to Preparing.");
+                            Console.WriteLine($"Order {current.OrderId} confirmed. Status updated to Preparing.");
                         }
                         else
                         {
@@ -379,7 +404,7 @@ void DeleteOrder()
 {
     Console.Write("Delete Order\n");
     Console.WriteLine("============");
-    Console.WriteLine("Enter Customer Email: ");
+    Console.Write("Enter Customer Email: ");
     string custEmail = Console.ReadLine();
     Console.WriteLine("Pending orders: ");
 
