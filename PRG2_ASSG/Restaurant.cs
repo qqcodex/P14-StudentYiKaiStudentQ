@@ -13,7 +13,7 @@ namespace PRG2_ASSG
         public string restaurantEmail {  get; set; }
         
         public List<Menu> menuList = new List<Menu>(); 
-        
+        public List<SpecialOffer> specialOfferList = new List<SpecialOffer>();
         public Queue<Order> orderQueue = new Queue<Order>(); 
 
         public Restaurant() { } //default constructor 
@@ -34,7 +34,10 @@ namespace PRG2_ASSG
         
         public void DisplaySpecialOffers()
         {
-
+            foreach (var offer in specialOfferList)
+            {
+                Console.WriteLine(offer.ToString());
+            }
         }
 
         public void DisplayMenu() 
