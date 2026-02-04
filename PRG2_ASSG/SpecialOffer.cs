@@ -21,6 +21,9 @@ namespace PRG2_ASSG
             this.discount = discount;
         }
 
-        public override string ToString() { return $"{offerCode}: {offerDesc} ({discount}%)"; }
+        public override string ToString() 
+        { 
+            return $"{offerCode}: {offerDesc} ({discount}%)"; 
+        }
     }
 }

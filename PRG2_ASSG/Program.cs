@@ -373,6 +373,10 @@ void ProcessOrder()
 //Q7) Modify an existing order - Yi Kai
 void ModifyOrder()
 {
+    Console.WriteLine("Modify Order");
+    Console.WriteLine("============");
+    Console.Write("Enter Customer Email: ");
+    string custEmail = Console.ReadLine().Trim();
 }
     //8) Delete an existing order - Q
 void DeleteOrder()

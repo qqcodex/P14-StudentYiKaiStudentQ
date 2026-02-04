@@ -35,15 +35,7 @@ namespace PRG2_ASSG
 
         public bool RemoveOrder(Order order)
         {
-            for (int i = 0; i < orderList.Count; i++)
-            {
-                if (orderList[i].OrderId == order.OrderId)
-                {
-                    orderList.RemoveAt(i);
-                    return true;
-                }
-            }
-            return false;
+            return orderList.Remove(order);
         }
 
         public override string ToString()
