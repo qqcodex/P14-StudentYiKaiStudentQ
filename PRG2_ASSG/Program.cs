@@ -26,6 +26,7 @@ InitialiseRestaurant();
 InitialiseFoodItem();
 InitialiseCustomer();
 InitialiseOrders();
+Console.WriteLine("First customer email: " + customerlist[0].emailAddress);
 
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurantlist.Count} restaurants loaded!");
@@ -157,8 +158,8 @@ void InitialiseCustomer()
     for (int i = 1; i < lines.Length; i++)
     {
         string[] data = lines[i].Split(',');
-        string email = data[0];
-        string name = data[1];
+        string email = data[1];
+        string name = data[0];
 
         Customer c = new Customer(email, name);
         customerlist.Add(c);
@@ -170,7 +171,16 @@ void InitialiseOrders()
     var lines = File.ReadAllLines("orders.csv");
     for (int i = 1; i < lines.Length; i++)
     {
-        string[] data = lines[i].Split(',');
+        string line = lines[i];
+
+        // extract quoted items first
+        int firstQuote = line.IndexOf('"');
+        int lastQuote = line.LastIndexOf('"');
+
+        string items = line.Substring(firstQuote + 1, lastQuote - firstQuote - 1);
+        line = line.Remove(firstQuote, lastQuote - firstQuote + 1);
+
+        string[] data = line.Split(',');
 
         int orderId = Convert.ToInt32(data[0]);
         string custEmail = data[1].Trim().ToLower(); 
@@ -178,12 +188,29 @@ void InitialiseOrders()
         string delivDate = data[3];
         string delivTime = data[4];
 
+        DateTime ParseDmyHm(string s)
+        {
+            s = s.Trim();
+            string[] parts = s.Split(' ');
+            string[] d = parts[0].Split('/');
+            string[] t = parts[1].Split(':');
+
+            int day = Convert.ToInt32(d[0]);
+            int month = Convert.ToInt32(d[1]);
+            int year = Convert.ToInt32(d[2]);
+            int hour = Convert.ToInt32(t[0]);
+            int minute = Convert.ToInt32(t[1]);
+
+            return new DateTime(year, month, day, hour, minute, 0);
+        }
+
         string combinedDeliv = delivDate + " " + delivTime;
-        DateTime delivDateTime = DateTime.ParseExact(combinedDeliv, "d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture);
+        DateTime delivDateTime = ParseDmyHm(combinedDeliv);
+
         string delivAddr = data[5];
-        
+
         string createdDateTimestr = data[6];
-        DateTime createdDateTime = DateTime.ParseExact(createdDateTimestr, "d/M/yyyy H:mm", System.Globalization.CultureInfo.InvariantCulture); //convert from "M/d/yyyy HH:mm" to datetime data type
+        DateTime createdDateTime = ParseDmyHm(createdDateTimestr);
 
         double orderTotal = Convert.ToDouble(data[7]);
         string orderStatus = data[8];
@@ -193,7 +220,9 @@ void InitialiseOrders()
         Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr, paymentMethod); // No bool orderPaid object 
         orderCount++;
 
-        string items = data[9];
+        string[] itemPairs = items.Split('|');
+
+
 
         Customer matchedCustomer = null;
 
