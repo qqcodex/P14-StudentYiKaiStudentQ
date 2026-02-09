@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 
 // Global lists and dictionaries
 List<Restaurant> restaurantList = new List<Restaurant>();
@@ -158,6 +159,7 @@ void InitialiseFoodItem()
         }
     }
 }
+
 
 // FEATURE 2 - Load customers and orders
 void InitialiseCustomer()
