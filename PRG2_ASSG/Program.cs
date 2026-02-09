@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 
+
 // Global lists and dictionaries
 List<Restaurant> restaurantList = new List<Restaurant>();
 Dictionary<string, Restaurant> restaurantMap = new Dictionary<string, Restaurant>();
@@ -49,43 +50,52 @@ while (!exit)
     string choice = Console.ReadLine();
     Console.WriteLine();
 
-    switch (choice)
+    // Using if-else instead of switch (switch not taught in syllabus)
+    if (choice == "1")
     {
-        case "1":
-            DisplayRestaurantMenuItem();
-            break;
-        case "2":
-            DisplayAllOrders();
-            break;
-        case "3":
-            CreateNewOrder();
-            break;
-        case "4":
-            ProcessOrder();
-            break;
-        case "5":
-            ModifyOrder();
-            break;
-        case "6":
-            DeleteOrder();
-            break;
-        case "7":
-            BulkProcessOrders();
-            break;
-        case "8":
-            DisplayTotalOrderAmount();
-            break;
-        case "9":
-            ApplySpecialOffer();
-            break;
-        case "0":
-            SaveQueueAndStack();
-            Console.WriteLine("Thank you for using Gruberoo!");
-            exit = true;
-            break;
-        default:
-            Console.WriteLine("Invalid option. Please try again.");
-            break;
+        DisplayRestaurantMenuItem();
+    }
+    else if (choice == "2")
+    {
+        DisplayAllOrders();
+    }
+    else if (choice == "3")
+    {
+        CreateNewOrder();
+    }
+    else if (choice == "4")
+    {
+        ProcessOrder();
+    }
+    else if (choice == "5")
+    {
+        ModifyOrder();
+    }
+    else if (choice == "6")
+    {
+        DeleteOrder();
+    }
+    else if (choice == "7")
+    {
+        BulkProcessOrders();
+    }
+    else if (choice == "8")
+    {
+        DisplayTotalOrderAmount();
+    }
+    else if (choice == "9")
+    {
+        ApplySpecialOffer();
+    }
+    else if (choice == "0")
+    {
+        SaveQueueAndStack();
+        Console.WriteLine("Thank you for using Gruberoo!");
+        exit = true;
+    }
+    else
+    {
+        Console.WriteLine("Invalid option. Please try again.");
     }
 
     if (!exit)
