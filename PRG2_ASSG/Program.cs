@@ -30,7 +30,7 @@ InitialiseFoodItem();
 InitialiseCustomer();
 InitialiseOrders();
 LoadSpecialOffers(); // Load special offers for advanced feature
-Console.Write();
+
 
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurantList.Count} restaurants loaded!");
@@ -516,7 +516,7 @@ void ProcessOrder()
     Console.WriteLine("Process Order");
     Console.WriteLine("=============");
     Console.Write("Enter Restaurant ID: ");
-    string rId = Console.ReadLine().Trim().ToUpper();
+    string rId = Console.ReadLine().Trim();
 
     if (!restaurantMap.ContainsKey(rId))
     {
@@ -545,20 +545,21 @@ void ProcessOrder()
 
         Console.WriteLine($"\nOrder {current.OrderId}:");
         Console.WriteLine($"Customer: {customerName}");
+        Console.WriteLine("Ordered Items:");
         current.DisplayOrderedFoodItems();
         Console.WriteLine($"Delivery date/time: {current.DeliveryDateTime:dd/MM/yyyy HH:mm}");
         Console.WriteLine($"Total Amount: ${current.OrderTotal:F2}");
         Console.WriteLine($"Order Status: {current.OrderStatus}");
 
         Console.Write("\n[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
-        string option = Console.ReadLine().Trim().ToUpper();
+        string option = Console.ReadLine().Trim();
 
         if (option == "C")
         {
             if (current.OrderStatus == "Pending")
             {
                 current.OrderStatus = "Preparing";
-                Console.WriteLine($"Order {current.OrderId} confirmed. Status: Preparing");
+                Console.WriteLine($"\nOrder {current.OrderId} confirmed. Status: Preparing");
             }
             else
             {
@@ -571,7 +572,7 @@ void ProcessOrder()
             {
                 current.OrderStatus = "Rejected";
                 refundStack.Push(current);
-                Console.WriteLine($"Order {current.OrderId} rejected. Refund of ${current.OrderTotal:F2} processed.");
+                Console.WriteLine($"\nOrder {current.OrderId} rejected. Refund of ${current.OrderTotal:F2} processed.");
             }
             else
             {
@@ -580,14 +581,14 @@ void ProcessOrder()
         }
         else if (option == "S")
         {
-            Console.WriteLine($"Order {current.OrderId} skipped.");
+            Console.WriteLine($"\nOrder {current.OrderId} skipped.");
         }
         else if (option == "D")
         {
             if (current.OrderStatus == "Preparing")
             {
                 current.OrderStatus = "Delivered";
-                Console.WriteLine($"Order {current.OrderId} delivered. Status: Delivered");
+                Console.WriteLine($"\nOrder {current.OrderId} delivered. Status: Delivered");
             }
             else
             {
@@ -596,7 +597,7 @@ void ProcessOrder()
         }
         else
         {
-            Console.WriteLine("Invalid option. Order skipped.");
+            Console.WriteLine("Error: Invalid option. Please enter 'C', 'R', 'S', or 'D' only. Order skipped.");
         }
 
         tempQueue.Enqueue(current);
@@ -817,18 +818,27 @@ void DeleteOrder()
     Console.WriteLine($"Total Amount: ${targetOrder.OrderTotal:F2}");
     Console.WriteLine($"Order Status: {targetOrder.OrderStatus}");
 
-    Console.Write("\nConfirm deletion? [Y/N]: ");
-    string confirm = Console.ReadLine().Trim().ToUpper();
+    while (true)
+    {
+        Console.Write("\nConfirm deletion? [Y/N]: ");
+        string confirm = Console.ReadLine().Trim();
 
-    if (confirm == "Y")
-    {
-        targetOrder.OrderStatus = "Cancelled";
-        refundStack.Push(targetOrder);
-        Console.WriteLine($"Order {targetOrder.OrderId} cancelled. Refund of ${targetOrder.OrderTotal:F2} processed.");
-    }
-    else
-    {
-        Console.WriteLine("Deletion cancelled.");
+        if (confirm == "Y")
+        {
+            targetOrder.OrderStatus = "Cancelled";
+            refundStack.Push(targetOrder);
+            Console.WriteLine($"\nOrder {targetOrder.OrderId} cancelled. Refund of ${targetOrder.OrderTotal:F2} processed.");
+            break;
+        }
+        else if (confirm == "N")
+        {
+            Console.WriteLine("Deletion cancelled.");
+            break;
+        }
+        else
+        {
+            Console.WriteLine("Error: Invalid input. Please enter 'Y' or 'N' only.");
+        }
     }
 }
 
