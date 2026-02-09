@@ -14,9 +14,9 @@ namespace PRG2_ASSG
 {
     internal class Menu
     {
-        public string menuId {  get; set; } 
-        public string menuName { get; set; }
-        
+        public string menuId { get; set; }
+        private string menuName { get; set; }
+
         public List<FoodItem> foodItemList = new List<FoodItem>();
 
         public Menu(string menuId, string menuName)
@@ -25,14 +25,14 @@ namespace PRG2_ASSG
             this.menuName = menuName;
         }
 
-        public void AddFoodItem(FoodItem item) 
-        { 
-            foodItemList.Add(item); 
+        public void AddFoodItem(FoodItem item)
+        {
+            foodItemList.Add(item);
         }
-        
-        public bool RemoveFoodItem(FoodItem item) 
-        { 
-            return foodItemList.Remove(item); 
+
+        public bool RemoveFoodItem(FoodItem item)
+        {
+            return foodItemList.Remove(item);
         }
 
         public void DisplayFoodItems()

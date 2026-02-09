@@ -17,8 +17,10 @@ namespace PRG2_ASSG
         public int QtyOrdered { get; set; }
         public double SubTotal { get; set; }
 
-        public OrderedFoodItem() : base() { } // default constructor
-        public OrderedFoodItem(string iname, string id, double ip,int qo) : base(iname,id,ip) //parameterised constructor
+        public OrderedFoodItem() : base() { }
+
+        // Changed parameter name from 'id' to 'idesc' to match FoodItem constructor
+        public OrderedFoodItem(string iname, string idesc, double ip, int qo) : base(iname, idesc, ip)
         {
             QtyOrdered = qo;
             SubTotal = CalculateSubtotal();
@@ -29,6 +31,7 @@ namespace PRG2_ASSG
             SubTotal = QtyOrdered * ItemPrice;
             return SubTotal;
         }
+
         public override string ToString()
         {
             return $"{ItemName} x{QtyOrdered} - ${SubTotal:F2}";

@@ -24,6 +24,7 @@ namespace PRG2_ASSG
         public string OrderPaymentMethod { get; set; }
         public bool OrderPaid { get; set; }
 
+        // Association: Order has many OrderedFoodItems
         public List<OrderedFoodItem> itemList { get; set; } = new List<OrderedFoodItem>();
 
         public Order() //default constructor 
@@ -40,6 +41,7 @@ namespace PRG2_ASSG
             DeliveryAddress = da;
             OrderPaymentMethod = opm;
             OrderPaid = paid;
+            itemList = new List<OrderedFoodItem>();
         }
 
         public double CalculateOrderTotal()
@@ -53,7 +55,7 @@ namespace PRG2_ASSG
             OrderTotal = totalNoFee + deliveryFee;
             return OrderTotal;
         }
-        
+
         public void AddOrderedFoodItem(OrderedFoodItem item)
         {
             itemList.Add(item);
@@ -66,10 +68,18 @@ namespace PRG2_ASSG
 
         public void DisplayOrderedFoodItems()
         {
-            Console.WriteLine("Ordered Items:");
-            for (int i = 0; i < itemList.Count; i++)
+            if (itemList == null || itemList.Count == 0)
             {
-                Console.WriteLine($"{i + 1}. {itemList[i].ItemName} - {itemList[i].QtyOrdered}");
+                Console.WriteLine("No items in this order.");
+                return;
+            }
+
+            int ind = 1;
+            foreach (OrderedFoodItem item in itemList)
+            {
+                double subtotal = item.ItemPrice * item.QtyOrdered;
+                Console.WriteLine($"{ind}. {item.ItemName} - {item.QtyOrdered}");
+                ind++;
             }
         }
 

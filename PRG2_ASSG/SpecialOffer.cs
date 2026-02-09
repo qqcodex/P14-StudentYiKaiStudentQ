@@ -14,8 +14,8 @@ namespace PRG2_ASSG
 {
     internal class SpecialOffer
     {
-        public string offerCode {  get; set; }
-        public string offerDesc {  get; set; }
+        public string offerCode { get; set; }
+        public string offerDesc { get; set; }
         public double discount { get; set; }
 
         public SpecialOffer() { }
@@ -27,9 +27,9 @@ namespace PRG2_ASSG
             this.discount = discount;
         }
 
-        public override string ToString() 
-        { 
-            return $"{offerCode}: {offerDesc} ({discount}%)"; 
+        public override string ToString()
+        {
+            return $"{offerCode}: {offerDesc} ({discount}%)";
         }
     }
 }

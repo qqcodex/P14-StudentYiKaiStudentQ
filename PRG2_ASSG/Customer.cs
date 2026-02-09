@@ -14,9 +14,9 @@ namespace PRG2_ASSG
 {
     internal class Customer
     {
-        public string emailAddress {  get; set; } 
+        public string emailAddress { get; set; }
         public string customerName { get; set; }
-            
+
         public List<Order> orderList = new List<Order>();
 
         public Customer() { }
@@ -27,10 +27,11 @@ namespace PRG2_ASSG
             this.customerName = customerName;
         }
 
-        public void AddOrder(Order order) 
-        { 
-            orderList.Add(order); 
-        } 
+        public void AddOrder(Order order)
+        {
+            orderList.Add(order);
+        }
+
         public void DisplayAllOrders()
         {
             foreach (Order item in orderList)
@@ -48,7 +49,6 @@ namespace PRG2_ASSG
         {
             return $"CustomerName: {customerName}  EmailAddress: {emailAddress}";
         }
-        
+
     }
-    
 }
