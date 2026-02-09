@@ -251,9 +251,9 @@ void InitialiseOrders()
 
             string delivDate = data[3].Trim();
             string delivTime = data[4].Trim();
-            DateTime delivDateTime = DateTime.ParseExact($"{delivDate} {delivTime}", "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+            DateTime delivDateTime = DateTime.ParseExact($"{delivDate} {delivTime}", "d/M/yyyy H:m", CultureInfo.InvariantCulture);
             string delivAddr = data[5].Trim();
-            DateTime createdDateTime = DateTime.ParseExact(data[6].Trim(), "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+            DateTime createdDateTime = DateTime.ParseExact(data[6].Trim(), "d/M/yyyy H:m", CultureInfo.InvariantCulture);
             double orderTotal = Convert.ToDouble(data[7].Trim());
             string orderStatus = data[8].Trim();
             string paymentMethod = data[10].Trim();
