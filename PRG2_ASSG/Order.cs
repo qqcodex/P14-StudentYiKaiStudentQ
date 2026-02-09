@@ -17,6 +17,8 @@ namespace PRG2_ASSG
         public string OrderPaymentMethod { get; set; }
         public bool OrderPaid { get; set; }
 
+        public List<OrderedFoodItem> itemList { get; set; } = new List<OrderedFoodItem>();
+
         public Order() //default constructor 
         {
         } 
@@ -44,7 +46,7 @@ namespace PRG2_ASSG
             OrderTotal = totalNoFee + deliveryFee;
             return OrderTotal;
         }
-        public List<OrderedFoodItem> itemList { get; set; } = new List<OrderedFoodItem>();
+        
         public void AddOrderedFoodItem(OrderedFoodItem item)
         {
             itemList.Add(item);

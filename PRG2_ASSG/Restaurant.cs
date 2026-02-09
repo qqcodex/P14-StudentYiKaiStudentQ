@@ -58,6 +58,11 @@ namespace PRG2_ASSG
             menuList.Remove(menu);
         }
 
+        public void AddSpecialOffer(SpecialOffer offer)
+        {
+            specialOfferList.Add(offer);
+        }
+
         public override string ToString()
         {
             return $"RestaurantName: {restaurantName}  RestaurantID: {restaurantId}  RestaurantEmail: {restaurantEmail}";

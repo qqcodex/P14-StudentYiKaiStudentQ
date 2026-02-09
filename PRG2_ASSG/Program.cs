@@ -157,8 +157,9 @@ void InitialiseCustomer()
     for (int i = 1; i < lines.Length; i++)
     {
         string[] data = lines[i].Split(',');
-        string email = data[0];
-        string name = data[1];
+        string name = data[0];
+        string email = data[1];
+        
 
         Customer c = new Customer(email, name);
         customerlist.Add(c);
