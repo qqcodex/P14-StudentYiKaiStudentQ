@@ -1,4 +1,10 @@
-﻿using System;
+﻿//==========================================================
+// Student Number : S10272951
+// Student Name : Dg Muhammad Aqil Bin Md Alias
+// Partner Name : Tan Yi Kai
+//==========================================================
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +14,7 @@ namespace PRG2_ASSG
 {
     class Order
     {
+        // Only 8 attributes as per class diagram
         public int OrderId { get; set; }
         public DateTime OrderDateTime { get; set; }
         public double OrderTotal { get; set; }
@@ -21,9 +28,9 @@ namespace PRG2_ASSG
 
         public Order() //default constructor 
         {
-        } 
+        }
 
-        public Order(int oi,DateTime odt,double ot,string os,DateTime ddt,string da, string opm) //parameterised constructor
+        public Order(int oi, DateTime odt, double ot, string os, DateTime ddt, string da, string opm, bool paid) //parameterised constructor
         {
             OrderId = oi;
             OrderDateTime = odt;
@@ -32,16 +39,16 @@ namespace PRG2_ASSG
             DeliveryDateTime = ddt;
             DeliveryAddress = da;
             OrderPaymentMethod = opm;
-            OrderPaid = false;
+            OrderPaid = paid;
         }
 
         public double CalculateOrderTotal()
         {
             double totalNoFee = 0;
             double deliveryFee = 5;
-            foreach(var order in itemList)
+            foreach (var item in itemList)
             {
-                totalNoFee += order.CalculateSubtotal();
+                totalNoFee += item.CalculateSubtotal();
             }
             OrderTotal = totalNoFee + deliveryFee;
             return OrderTotal;
@@ -61,14 +68,14 @@ namespace PRG2_ASSG
         {
             Console.WriteLine("Ordered Items:");
             for (int i = 0; i < itemList.Count; i++)
-                Console.WriteLine($"{i + 1}. {itemList[i].ItemName} x{itemList[i].QtyOrdered}");
+            {
+                Console.WriteLine($"{i + 1}. {itemList[i].ItemName} - {itemList[i].QtyOrdered}");
+            }
         }
-
 
         public override string ToString()
         {
-            return $"OrderID: {OrderId}  Total: ${OrderTotal:F2}  Status: {OrderStatus}";
+            return $"Order {OrderId}: Status={OrderStatus}, Total=${OrderTotal:F2}, Delivery={DeliveryDateTime:dd/MM/yyyy HH:mm}";
         }
-
     }
 }

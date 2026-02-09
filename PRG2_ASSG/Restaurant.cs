@@ -1,4 +1,10 @@
-﻿using System;
+﻿//==========================================================
+// Student Number : S10272951
+// Student Name : Dg Muhammad Aqil Bin Md Alias
+// Partner Name : Tan Yi Kai
+//==========================================================
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,22 +14,23 @@ namespace PRG2_ASSG
 {
     internal class Restaurant
     {
-        public string restaurantId {  get; set; } 
-        public string restaurantName {  get; set; }
-        public string restaurantEmail {  get; set; }
-        
-        public List<Menu> menuList = new List<Menu>(); 
+        public string restaurantId { get; set; }
+        public string restaurantName { get; set; }
+        public string restaurantEmail { get; set; }
+
+        public List<Menu> menuList = new List<Menu>();
         public List<SpecialOffer> specialOfferList = new List<SpecialOffer>();
-        public Queue<Order> orderQueue = new Queue<Order>(); 
+        public Queue<Order> orderQueue = new Queue<Order>();
 
         public Restaurant() { } //default constructor 
 
-        public Restaurant(string rid,string rn,string re) // parameterized constructor
+        public Restaurant(string rid, string rn, string re) // parameterized constructor
         {
             restaurantId = rid;
             restaurantName = rn;
             restaurantEmail = re;
         }
+
         public void DisplayOrders()
         {
             foreach (Order order in orderQueue)
@@ -31,7 +38,7 @@ namespace PRG2_ASSG
                 Console.WriteLine(order.ToString());
             }
         }
-        
+
         public void DisplaySpecialOffers()
         {
             foreach (var offer in specialOfferList)
@@ -40,7 +47,7 @@ namespace PRG2_ASSG
             }
         }
 
-        public void DisplayMenu() 
+        public void DisplayMenu()
         {
             foreach (var menu in menuList)
             {
@@ -48,9 +55,9 @@ namespace PRG2_ASSG
             }
         }
 
-        public void AddMenu(Menu menu) 
-        { 
-            menuList.Add(menu); 
+        public void AddMenu(Menu menu)
+        {
+            menuList.Add(menu);
         }
 
         public void RemoveMenu(Menu menu)
@@ -65,7 +72,8 @@ namespace PRG2_ASSG
 
         public override string ToString()
         {
-            return $"RestaurantName: {restaurantName}  RestaurantID: {restaurantId}  RestaurantEmail: {restaurantEmail}";
+            return $"Restaurant: {restaurantName} ({restaurantId})";
         }
     }
 }
+
