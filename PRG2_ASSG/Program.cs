@@ -267,15 +267,23 @@ void InitialiseOrders()
             {
                 string[] parts = chunk.Split(',');
                 if (parts.Length < 2) continue;
-
                 string itemName = parts[0].Trim();
-
                 if (!int.TryParse(parts[1].Trim(), out int qty))
                     continue;
 
-                FoodItem fi = restaurant.menuList
-                    .SelectMany(m => m.foodItemList)
-                    .FirstOrDefault(x => x.ItemName.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+                FoodItem fi = null;
+                foreach (Menu m in restaurant.menuList)
+                {
+                    foreach (FoodItem item in m.foodItemList)
+                    {
+                        if (item.ItemName.Equals(itemName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            fi = item;
+                            break;
+                        }
+                    }
+                    if (fi != null) break;
+                }
 
                 if (fi != null)
                 {
