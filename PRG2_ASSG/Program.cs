@@ -881,6 +881,7 @@ void DeleteOrder()
     string customerName = customer.customerName;
 
     Console.WriteLine($"\nCustomer: {customerName}");
+    Console.WriteLine($"Ordered Items: ");
     targetOrder.DisplayOrderedFoodItems();
     Console.WriteLine($"Delivery date/time: {targetOrder.DeliveryDateTime:dd/MM/yyyy HH:mm}");
     Console.WriteLine($"Total Amount: ${targetOrder.OrderTotal:F2}");
@@ -888,7 +889,7 @@ void DeleteOrder()
 
     while (true)
     {
-        Console.Write("\nConfirm deletion? [Y/N]: ");
+        Console.Write("Confirm deletion? [Y/N]: ");
         string confirm = Console.ReadLine().Trim();
 
         if (confirm == "Y")
@@ -900,7 +901,7 @@ void DeleteOrder()
         }
         else if (confirm == "N")
         {
-            Console.WriteLine("Deletion cancelled.");
+            Console.WriteLine("\nDeletion cancelled.");
             break;
         }
         else
