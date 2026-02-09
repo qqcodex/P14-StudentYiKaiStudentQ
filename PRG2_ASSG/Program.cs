@@ -992,103 +992,88 @@ void BulkProcessOrders()
         Console.WriteLine("\nNo orders in the system.");
     }
 }
-
 // ADVANCED FEATURE (b) - Display total order amount
 void DisplayTotalOrderAmount()
 {
     Console.WriteLine("Total Order Amounts and Revenue Report");
     Console.WriteLine("======================================\n");
 
-    double grandTotalRevenue = 0;
-    double grandTotalRefunds = 0;
     const double GRUBEROO_COMMISSION = 0.30; // 30%
     const double DELIVERY_FEE = 5.00;
 
+    double grandDeliveredFoodSales = 0; // delivered orders total LESS delivery fee
+    double grandTotalRefunds = 0;
+
+    int grandDeliveredCount = 0;
+
     // Process each restaurant
-    foreach (Restaurant restaurant in restaurantList)
+    for (int r = 0; r < restaurantList.Count; r++)
     {
+        Restaurant restaurant = restaurantList[r];
+
         Console.WriteLine($"\n{restaurant.restaurantName} ({restaurant.restaurantId})");
         Console.WriteLine(new string('-', 50));
 
-        double restaurantTotalRevenue = 0;
+        double restaurantDeliveredFoodSales = 0; // (OrderTotal - delivery fee)
         double restaurantTotalRefunds = 0;
+
         int deliveredCount = 0;
         int refundedCount = 0;
 
-        // Get all orders for this restaurant
-        List<Order> restaurantOrders = new List<Order>();
-        foreach (var kvp in orderToRestaurantMap)
+        // Loop through all orders mapped to restaurants
+        foreach (KeyValuePair<Order, Restaurant> kvp in orderToRestaurantMap)
         {
-            if (kvp.Value.restaurantId == restaurant.restaurantId)
-            {
-                restaurantOrders.Add(kvp.Key);
-            }
-        }
+            Order order = kvp.Key;
+            Restaurant mappedRestaurant = kvp.Value;
 
-        // Calculate delivered orders revenue
-        foreach (Order order in restaurantOrders)
-        {
+            if (mappedRestaurant.restaurantId != restaurant.restaurantId)
+                continue;
+
+            // Successful orders (Delivered)
             if (order.OrderStatus == "Delivered")
             {
-                // Order total includes delivery fee, subtract it for restaurant revenue
-                double orderAmountNoDelivery = order.OrderTotal - DELIVERY_FEE;
-                restaurantTotalRevenue += orderAmountNoDelivery;
+                // Requirement: total order amount LESS delivery fee per order
+                double foodPart = order.OrderTotal - DELIVERY_FEE;
+                if (foodPart < 0) foodPart = 0; // safety, in case of weird data
+
+                restaurantDeliveredFoodSales += foodPart;
                 deliveredCount++;
             }
-        }
-
-        // Calculate refunded orders (from all orders in customer lists)
-        foreach (Customer customer in customerList)
-        {
-            foreach (Order order in customer.orderList)
+            // Refunded orders
+            else if (order.OrderStatus == "Rejected" || order.OrderStatus == "Cancelled")
             {
-                if (orderToRestaurantMap.ContainsKey(order) &&
-                    orderToRestaurantMap[order].restaurantId == restaurant.restaurantId)
-                {
-                    if (order.OrderStatus == "Rejected" || order.OrderStatus == "Cancelled")
-                    {
-                        restaurantTotalRefunds += order.OrderTotal;
-                        refundedCount++;
-                    }
-                }
+                restaurantTotalRefunds += order.OrderTotal;
+                refundedCount++;
             }
         }
 
         Console.WriteLine($"Delivered Orders: {deliveredCount}");
-        Console.WriteLine($"  Total Revenue (excl. delivery): ${restaurantTotalRevenue:F2}");
+        Console.WriteLine($"  Total Order Amount (less delivery fee): ${restaurantDeliveredFoodSales:F2}");
+
         Console.WriteLine($"\nRefunded Orders: {refundedCount}");
         Console.WriteLine($"  Total Refunds: ${restaurantTotalRefunds:F2}");
 
-        double netRevenue = restaurantTotalRevenue - restaurantTotalRefunds;
-        Console.WriteLine($"\nNet Revenue: ${netRevenue:F2}");
-
-        grandTotalRevenue += restaurantTotalRevenue;
+        grandDeliveredFoodSales += restaurantDeliveredFoodSales;
         grandTotalRefunds += restaurantTotalRefunds;
+        grandDeliveredCount += deliveredCount;
     }
 
     // Display grand totals
     Console.WriteLine("\n" + new string('=', 50));
     Console.WriteLine("OVERALL SUMMARY");
     Console.WriteLine(new string('=', 50));
-    Console.WriteLine($"Total Revenue (all restaurants): ${grandTotalRevenue:F2}");
-    Console.WriteLine($"Total Refunds (all restaurants): ${grandTotalRefunds:F2}");
-    Console.WriteLine($"Net Revenue: ${grandTotalRevenue - grandTotalRefunds:F2}");
+    Console.WriteLine($"Total Order Amount (less delivery fee): ${grandDeliveredFoodSales:F2}");
+    Console.WriteLine($"Total Refunds: ${grandTotalRefunds:F2}");
 
-    // Calculate Gruberoo's earnings
-    double gruberooEarnings = (grandTotalRevenue - grandTotalRefunds) * GRUBEROO_COMMISSION;
-    Console.WriteLine($"\nGruberoo Commission (30%): ${gruberooEarnings:F2}");
+    // Final amount Gruberoo earns:
+    // - 30% commission on delivered FOOD sales (excluding delivery fee)
+    // - plus all delivery fees from delivered orders
+    double totalDeliveryFees = grandDeliveredCount * DELIVERY_FEE;
+    double gruberooCommission = grandDeliveredFoodSales * GRUBEROO_COMMISSION;
+    double finalGruberooEarnings = gruberooCommission + totalDeliveryFees;
 
-    // Calculate total delivery fees collected
-    int totalDeliveredOrders = 0;
-    foreach (Customer customer in customerList)
-    {
-        totalDeliveredOrders += customer.orderList.Count(o => o.OrderStatus == "Delivered");
-    }
-    double totalDeliveryFees = totalDeliveredOrders * DELIVERY_FEE;
-    Console.WriteLine($"Delivery Fees Collected: ${totalDeliveryFees:F2}");
-
-    double totalGruberooEarnings = gruberooEarnings + totalDeliveryFees;
-    Console.WriteLine($"\n*** TOTAL GRUBEROO EARNINGS: ${totalGruberooEarnings:F2} ***");
+    Console.WriteLine($"\nFinal Amount Gruberoo Earns: ${finalGruberooEarnings:F2}");
+    Console.WriteLine($"  (Commission: ${gruberooCommission:F2} + Delivery Fees: ${totalDeliveryFees:F2})");
 }
 
 // ADVANCED FEATURE (c) - BONUS: Apply special offer to order
