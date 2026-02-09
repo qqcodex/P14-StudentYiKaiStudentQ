@@ -357,7 +357,7 @@ void DisplayAllOrders()
             Restaurant r = orderToRestaurantMap.ContainsKey(o) ? orderToRestaurantMap[o] : null;
             string restaurantName = r != null ? r.restaurantName : "Unknown";
 
-            Console.WriteLine($"{o.OrderId,-12}{c.customerName,-25}{restaurantName,-20}{o.DeliveryDateTime:dd/MM/yyyy HH:mm,-25}${o.OrderTotal,-9:F2}{o.OrderStatus}");
+            Console.WriteLine($"{o.OrderId,-12}{c.customerName,-25}{restaurantName,-20}{o.DeliveryDateTime,-25:dd/MM/yyyy HH:mm}{o.OrderTotal,-10:C}{o.OrderStatus}");
         }
     }
 }
