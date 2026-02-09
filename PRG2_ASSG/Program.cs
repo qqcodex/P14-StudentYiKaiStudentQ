@@ -186,7 +186,6 @@ void InitialiseCustomer()
         customerMap.Add(email, c);
     }
 }
-
 void InitialiseOrders()
 {
     var lines = File.ReadAllLines("orders.csv");
@@ -195,9 +194,32 @@ void InitialiseOrders()
     {
         if (string.IsNullOrWhiteSpace(lines[i])) continue;
 
-        string[] data = lines[i].Split(',');
+        // Manual CSV parsing to handle quoted fields
+        List<string> data = new List<string>();
+        bool inQuotes = false;
+        string currentField = "";
 
-        if (data.Length < 11)
+        for (int j = 0; j < lines[i].Length; j++)
+        {
+            char c = lines[i][j];
+
+            if (c == '"')
+            {
+                inQuotes = !inQuotes;
+            }
+            else if (c == ',' && !inQuotes)
+            {
+                data.Add(currentField);
+                currentField = "";
+            }
+            else
+            {
+                currentField += c;
+            }
+        }
+        data.Add(currentField); // Add last field
+
+        if (data.Count < 11)
         {
             Console.WriteLine($"Warning: Skipping malformed line {i} in orders.csv");
             continue;
@@ -208,6 +230,15 @@ void InitialiseOrders()
             int orderId = Convert.ToInt32(data[0].Trim());
             string custEmail = data[1].Trim();
             string restId = data[2].Trim();
+
+            if (!restaurantMap.ContainsKey(restId))
+            {
+                Console.WriteLine($"Warning: Restaurant {restId} not found for order {orderId}");
+                continue;
+            }
+
+            Restaurant restaurant = restaurantMap[restId];
+
             string delivDate = data[3].Trim();
             string delivTime = data[4].Trim();
             DateTime delivDateTime = DateTime.ParseExact($"{delivDate} {delivTime}", "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
@@ -215,40 +246,33 @@ void InitialiseOrders()
             DateTime createdDateTime = DateTime.ParseExact(data[6].Trim(), "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
             double orderTotal = Convert.ToDouble(data[7].Trim());
             string orderStatus = data[8].Trim();
-            string items = data[9].Trim();
             string paymentMethod = data[10].Trim();
 
-            // Create order with only the 8 attributes
             Order o = new Order(orderId, createdDateTime, orderTotal, orderStatus, delivDateTime, delivAddr, paymentMethod, true);
 
-            // Parse items and add to order
-            string[] itemPairs = items.Split('|');
-            foreach (string itemPair in itemPairs)
+            string itemsStr = data[9].Trim().Trim('"');
+            string[] itemChunks = itemsStr.Split('|', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string chunk in itemChunks)
             {
-                string[] parts = itemPair.Split(',');
+                string[] parts = chunk.Split(',');
                 if (parts.Length < 2) continue;
 
                 string itemName = parts[0].Trim();
-                int qty = Convert.ToInt32(parts[1].Trim());
 
-                // Find the food item in restaurant menu
-                if (restaurantMap.ContainsKey(restId))
+                if (!int.TryParse(parts[1].Trim(), out int qty))
+                    continue;
+
+                FoodItem fi = restaurant.menuList
+                    .SelectMany(m => m.foodItemList)
+                    .FirstOrDefault(x => x.ItemName.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+
+                if (fi != null)
                 {
-                    Restaurant rest = restaurantMap[restId];
-                    foreach (Menu menu in rest.menuList)
-                    {
-                        FoodItem foodItem = menu.foodItemList.FirstOrDefault(f => f.ItemName == itemName);
-                        if (foodItem != null)
-                        {
-                            OrderedFoodItem orderedItem = new OrderedFoodItem(foodItem.ItemName, foodItem.ItemDesc, foodItem.ItemPrice, qty);
-                            o.AddOrderedFoodItem(orderedItem);
-                            break;
-                        }
-                    }
+                    o.itemList.Add(new OrderedFoodItem(fi.ItemName, fi.ItemDesc, fi.ItemPrice, qty));
                 }
             }
 
-            // Store mappings
             if (customerMap.ContainsKey(custEmail))
             {
                 Customer customer = customerMap[custEmail];
@@ -256,14 +280,9 @@ void InitialiseOrders()
                 orderToCustomerMap[o] = customer;
             }
 
-            if (restaurantMap.ContainsKey(restId))
-            {
-                Restaurant restaurant = restaurantMap[restId];
-                restaurant.orderQueue.Enqueue(o);
-                orderToRestaurantMap[o] = restaurant;
-            }
+            restaurant.orderQueue.Enqueue(o);
+            orderToRestaurantMap[o] = restaurant;
 
-            // Update nextOrderId
             if (orderId >= nextOrderId)
             {
                 nextOrderId = orderId + 1;
@@ -275,7 +294,6 @@ void InitialiseOrders()
         }
     }
 }
-
 // Display main menu
 void DisplayMainMenu()
 {
@@ -354,7 +372,7 @@ void CreateNewOrder()
 
     // Get and validate restaurant ID
     Console.Write("Enter Restaurant ID: ");
-    string restId = Console.ReadLine().Trim().ToUpper();
+    string restId = Console.ReadLine().Trim();
 
     if (!restaurantMap.ContainsKey(restId))
     {
@@ -451,14 +469,27 @@ void CreateNewOrder()
     }
 
     // Special request
-    Console.Write("Add special request? [Y/N]: ");
-    string specialReqChoice = Console.ReadLine().Trim().ToUpper();
-    if (specialReqChoice == "Y")
+    while (true)
     {
-        Console.Write("Enter special request: ");
-        string specialRequest = Console.ReadLine().Trim();
-        // Note: Special request would be stored if Order class had that attribute
-        // For now, we acknowledge it but can't store it per class diagram
+        Console.Write("Add special request? [Y/N]: ");
+        string specialReqChoice = Console.ReadLine().Trim();
+
+        if (specialReqChoice == "Y")
+        {
+            Console.Write("Enter special request: ");
+            string specialRequest = Console.ReadLine().Trim();
+            // Note: Special request would be stored if Order class had that attribute
+            // For now, we acknowledge it but can't store it per class diagram
+            break;
+        }
+        else if (specialReqChoice == "N")
+        {
+            break;
+        }
+        else
+        {
+            Console.WriteLine("Error: Invalid input. Please enter 'Y' or 'N' only.");
+        }
     }
 
     // Calculate total
@@ -466,19 +497,31 @@ void CreateNewOrder()
     Console.WriteLine($"\nOrder Total: ${orderTotal - 5:F2} + $5.00 (delivery) = ${orderTotal:F2}");
 
     // Payment
-    Console.Write("Proceed to payment? [Y/N]: ");
-    string payChoice = Console.ReadLine().Trim().ToUpper();
-    if (payChoice != "Y")
+    while (true)
     {
-        Console.WriteLine("Order cancelled.");
-        return;
+        Console.Write("Proceed to payment? [Y/N]: ");
+        string payChoice = Console.ReadLine().Trim();
+
+        if (payChoice == "Y")
+        {
+            break; // Proceed to payment
+        }
+        else if (payChoice == "N")
+        {
+            Console.WriteLine("Order cancelled.");
+            return;
+        }
+        else
+        {
+            Console.WriteLine("Error: Invalid input. Please enter 'Y' or 'N' only.");
+        }
     }
 
     string paymentMethod = "";
     while (true)
     {
-        Console.Write("Payment method:\n[CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ");
-        string payMethodChoice = Console.ReadLine().Trim().ToUpper();
+        Console.Write("\nPayment method:\n[CC] Credit Card / [PP] PayPal / [CD] Cash on Delivery: ");
+        string payMethodChoice = Console.ReadLine().Trim();
 
         if (payMethodChoice == "CC" || payMethodChoice == "PP" || payMethodChoice == "CD")
         {
@@ -487,7 +530,7 @@ void CreateNewOrder()
         }
         else
         {
-            Console.WriteLine("Error: Invalid payment method.");
+            Console.WriteLine("Error: Invalid payment method. Please enter 'CC', 'PP', or 'CD' only.");
         }
     }
 
@@ -655,119 +698,132 @@ void ModifyOrder()
         return;
     }
 
-    Console.WriteLine("\nOrder Items:");
+    Console.WriteLine("Order Items:");
     targetOrder.DisplayOrderedFoodItems();
-    Console.WriteLine($"\nAddress:\n{targetOrder.DeliveryAddress}");
-    Console.WriteLine($"\nDelivery Date/Time:\n{targetOrder.DeliveryDateTime:dd/MM/yyyy HH:mm}");
+    Console.WriteLine($"Address:\n{targetOrder.DeliveryAddress}");
+    Console.WriteLine($"Delivery Date/Time:\n{targetOrder.DeliveryDateTime:dd/MM/yyyy HH:mm}");
 
     Console.Write("\nModify: [1] Items [2] Address [3] Delivery Time: ");
     string modChoice = Console.ReadLine().Trim();
 
-    switch (modChoice)
+    // Using if-else instead of switch (switch not taught in syllabus)
+    if (modChoice == "1")
     {
-        case "1":
-            // Modify items
-            Restaurant restaurant = orderToRestaurantMap.ContainsKey(targetOrder) ? orderToRestaurantMap[targetOrder] : null;
-            if (restaurant == null)
+        // Modify items
+        Restaurant restaurant = orderToRestaurantMap.ContainsKey(targetOrder) ? orderToRestaurantMap[targetOrder] : null;
+        if (restaurant == null)
+        {
+            Console.WriteLine("Error: Cannot find restaurant for this order.");
+            return;
+        }
+
+        Console.WriteLine("\nAvailable Food Items:");
+        List<FoodItem> availableItems = restaurant.menuList[0].foodItemList;
+        for (int i = 0; i < availableItems.Count; i++)
+        {
+            Console.WriteLine($"{i + 1}. {availableItems[i].ItemName} - ${availableItems[i].ItemPrice:F2}");
+        }
+
+        targetOrder.itemList.Clear();
+        while (true)
+        {
+            Console.Write("Enter food item number (or 0 to finish): ");
+            if (!int.TryParse(Console.ReadLine(), out int itemNum))
             {
-                Console.WriteLine("Error: Cannot find restaurant for this order.");
-                return;
+                Console.WriteLine("Error: Please enter a valid number.");
+                continue;
             }
 
-            Console.WriteLine("\nAvailable Food Items:");
-            List<FoodItem> availableItems = restaurant.menuList[0].foodItemList;
-            for (int i = 0; i < availableItems.Count; i++)
+            if (itemNum == 0) break;
+
+            if (itemNum < 1 || itemNum > availableItems.Count)
             {
-                Console.WriteLine($"{i + 1}. {availableItems[i].ItemName} - ${availableItems[i].ItemPrice:F2}");
+                Console.WriteLine("Error: Invalid item number.");
+                continue;
             }
 
-            targetOrder.itemList.Clear();
+            Console.Write("Enter quantity: ");
+            if (!int.TryParse(Console.ReadLine(), out int qty) || qty <= 0)
+            {
+                Console.WriteLine("Error: Please enter a valid quantity.");
+                continue;
+            }
+
+            FoodItem selectedItem = availableItems[itemNum - 1];
+            OrderedFoodItem orderedItem = new OrderedFoodItem(selectedItem.ItemName, selectedItem.ItemDesc, selectedItem.ItemPrice, qty);
+            targetOrder.AddOrderedFoodItem(orderedItem);
+        }
+
+        double oldTotal = targetOrder.OrderTotal;
+        double newTotal = targetOrder.CalculateOrderTotal();
+
+        if (newTotal > oldTotal)
+        {
+            Console.WriteLine($"Additional payment required: ${newTotal - oldTotal:F2}");
+
             while (true)
             {
-                Console.Write("Enter item number (0 to finish): ");
-                if (!int.TryParse(Console.ReadLine(), out int itemNum))
-                {
-                    Console.WriteLine("Error: Please enter a valid number.");
-                    continue;
-                }
-
-                if (itemNum == 0) break;
-
-                if (itemNum < 1 || itemNum > availableItems.Count)
-                {
-                    Console.WriteLine("Error: Invalid item number.");
-                    continue;
-                }
-
-                Console.Write("Enter quantity: ");
-                if (!int.TryParse(Console.ReadLine(), out int qty) || qty <= 0)
-                {
-                    Console.WriteLine("Error: Please enter a valid quantity.");
-                    continue;
-                }
-
-                FoodItem selectedItem = availableItems[itemNum - 1];
-                OrderedFoodItem orderedItem = new OrderedFoodItem(selectedItem.ItemName, selectedItem.ItemDesc, selectedItem.ItemPrice, qty);
-                targetOrder.AddOrderedFoodItem(orderedItem);
-            }
-
-            double oldTotal = targetOrder.OrderTotal;
-            double newTotal = targetOrder.CalculateOrderTotal();
-
-            if (newTotal > oldTotal)
-            {
-                Console.WriteLine($"Additional payment required: ${newTotal - oldTotal:F2}");
                 Console.Write("Proceed to payment? [Y/N]: ");
-                string payChoice = Console.ReadLine().Trim().ToUpper();
-                if (payChoice != "Y")
+                string payChoice = Console.ReadLine().Trim();
+
+                if (payChoice == "Y")
+                {
+                    break; // Proceed
+                }
+                else if (payChoice == "N")
                 {
                     Console.WriteLine("Modification cancelled.");
                     return;
                 }
+                else
+                {
+                    Console.WriteLine("Error: Invalid input. Please enter 'Y' or 'N' only.");
+                }
             }
+        }
 
-            Console.WriteLine($"Order {targetOrder.OrderId} updated. New Total: ${newTotal:F2}");
-            break;
-
-        case "2":
-            // Modify address
-            Console.Write("Enter new Delivery Address: ");
-            string newAddr = Console.ReadLine().Trim();
-            if (!string.IsNullOrWhiteSpace(newAddr))
-            {
-                targetOrder.DeliveryAddress = newAddr;
-                Console.WriteLine($"Order {targetOrder.OrderId} updated. New Address: {newAddr}");
-            }
-            else
-            {
-                Console.WriteLine("Error: Address cannot be empty.");
-            }
-            break;
-
-        case "3":
-            // Modify delivery time
-            Console.Write("Enter new Delivery Time (hh:mm): ");
-            string newTimeStr = Console.ReadLine().Trim();
-            try
-            {
-                DateTime newDateTime = DateTime.ParseExact(
-                    $"{targetOrder.DeliveryDateTime:dd/MM/yyyy} {newTimeStr}",
-                    "dd/MM/yyyy HH:mm",
-                    CultureInfo.InvariantCulture);
-                targetOrder.DeliveryDateTime = newDateTime;
-                Console.WriteLine($"Order {targetOrder.OrderId} updated. New Delivery Time: {newTimeStr}");
-            }
-            catch
-            {
-                Console.WriteLine("Error: Invalid time format.");
-            }
-            break;
-
-        default:
-            Console.WriteLine("Invalid option.");
-            break;
+        Console.WriteLine($"\nOrder {targetOrder.OrderId} updated. New Total: ${newTotal:F2}");
+    }
+    else if (modChoice == "2")
+    {
+        // Modify address
+        Console.Write("Enter new Delivery Address: ");
+        string newAddr = Console.ReadLine().Trim();
+        if (!string.IsNullOrWhiteSpace(newAddr))
+        {
+            targetOrder.DeliveryAddress = newAddr;
+            Console.WriteLine($"Order {targetOrder.OrderId} updated. New Address: {newAddr}");
+        }
+        else
+        {
+            Console.WriteLine("Error: Address cannot be empty.");
+        }
+    }
+    else if (modChoice == "3")
+    {
+        // Modify delivery time
+        Console.Write("Enter new Delivery Time (hh:mm): ");
+        string newTimeStr = Console.ReadLine().Trim();
+        try
+        {
+            DateTime newDateTime = DateTime.ParseExact(
+                $"{targetOrder.DeliveryDateTime:dd/MM/yyyy} {newTimeStr}",
+                "dd/MM/yyyy HH:mm",
+                CultureInfo.InvariantCulture);
+            targetOrder.DeliveryDateTime = newDateTime;
+            Console.WriteLine($"\nOrder {targetOrder.OrderId} updated. New Delivery Time: {newTimeStr}");
+        }
+        catch
+        {
+            Console.WriteLine("Error: Invalid time format.");
+        }
+    }
+    else
+    {
+        Console.WriteLine("Error: Invalid option. Please enter '1', '2', or '3' only.");
     }
 }
+
 
 // FEATURE 8 - Delete an existing order
 void DeleteOrder()
