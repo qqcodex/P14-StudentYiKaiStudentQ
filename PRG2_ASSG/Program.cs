@@ -146,66 +146,78 @@ void DisplayMainMenu()
 // FEATURE 1 - Load restaurants and food items (Q)
 void InitialiseRestaurant()
 {
-    var lines = File.ReadAllLines("restaurants.csv");
+    var lines = File.ReadAllLines("restaurants.csv"); //READ ALL Lines from restaurants.csv into an array
 
-    for (int i = 1; i < lines.Length; i++)
+    for (int i = 1; i < lines.Length; i++) //start from index1 to skip header
     {
-        if (string.IsNullOrWhiteSpace(lines[i])) continue;
+        if (string.IsNullOrWhiteSpace(lines[i])) continue; //skip empty or blank lines in csv when reading
 
-        string[] details = lines[i].Split(',');
+        string[] details = lines[i].Split(','); //split CS line by comma into indiv fields
 
-        if (details.Length < 3)
+        if (details.Length < 3) //check if have required number of columns 
         {
             Console.WriteLine($"Warning: Skipping malformed line {i} in restaurants.csv");
             continue;
         }
 
-        string rid = details[0].Trim();
-        string rn = details[1].Trim();
-        string re = details[2].Trim();
+        string rid = details[0].Trim(); //extract restaurant id and clean data
+        string rn = details[1].Trim(); //extract restaurant name and clean data
+        string re = details[2].Trim(); //extract restaurant email and clean data
 
-        Restaurant r = new Restaurant(rid, rn, re);
-        r.AddMenu(new Menu("M001", "Main Menu"));
-        restaurantList.Add(r);
-        restaurantMap.Add(rid, r);
+        Restaurant r = new Restaurant(rid, rn, re); //create restaurant object 
+        r.AddMenu(new Menu("M001", "Main Menu")); // Add a default menu to the restaurant
+        restaurantList.Add(r); //store restaurant object into list 
+        restaurantMap.Add(rid, r); //store restaurant object into dict for lookup with rid as key and restaurant object as value
     }
 }
 
 void InitialiseFoodItem()
 {
+    // Read all lines from fooditems.csv into an array
     var lines = File.ReadAllLines("fooditems.csv");
 
+    // Start from index 1 to skip the header row
     for (int i = 1; i < lines.Length; i++)
     {
+        // Skip any blank lines in the CSV
         if (string.IsNullOrWhiteSpace(lines[i])) continue;
 
+        // Split the CSV line into individual values using comma
         string[] details = lines[i].Split(',');
 
+        // Check if the line has the required number of columns
         if (details.Length < 4)
         {
             Console.WriteLine($"Warning: Skipping malformed line {i} in fooditems.csv");
             continue;
         }
 
-        string rid = details[0].Trim();
-        string iname = details[1].Trim();
-        string idesc = details[2].Trim();
-        double iprice;
+        // Extract and clean the data from each column
+        string rid = details[0].Trim();     // Restaurant ID (used to know which restaurant this item belongs to)
+        string iname = details[1].Trim();   // Food item name
+        string idesc = details[2].Trim();   // Food item description
+        double iprice;                     // Food item price
 
+        // Validate that the price can be converted into a number
+        // get price column and clean then convert into double and store inside iprice IF conversion fails 
         if (!double.TryParse(details[3].Trim(), out iprice))
         {
             Console.WriteLine($"Warning: Invalid price on line {i} in fooditems.csv");
             continue;
         }
 
+        // Create a FoodItem object using the data from CSV
         FoodItem fi = new FoodItem(iname, idesc, iprice);
+
+        // Check if the restaurant ID exists in the dictionary
         if (restaurantMap.ContainsKey(rid))
         {
-            Restaurant r = restaurantMap[rid];
-            r.menuList[0].AddFoodItem(fi);
+            Restaurant r = restaurantMap[rid]; // Retrieve the restaurant object from the dictionary
+            r.menuList[0].AddFoodItem(fi); // Add the food item into the restaurant's main menu
         }
     }
 }
+
 
 
 // FEATURE 2 - Load customers and orders (Yi Kai)
@@ -1073,7 +1085,7 @@ void DisplayTotalOrderAmount()
     Console.WriteLine("======================================\n");
 
     // Fixed values used for calculation
-    double GRUBEROO_COMMISSION = 0.30; // Gruberoo earns 30% from food sales
+    double GRUBEROO_COMMISSION = 0.30; // Gruberoo earns 30% per order
     double DELIVERY_FEE = 5.00;        // Fixed delivery fee per order
 
     // Variables to store overall totals across ALL restaurants
