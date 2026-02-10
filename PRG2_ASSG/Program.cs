@@ -1487,7 +1487,7 @@ void DisplayCustomerNotifications()
 void SaveQueueAndStack()
 {
     // Save queue
-    using (StreamWriter sw = new StreamWriter("queue.csv"))
+    using (StreamWriter sw = new StreamWriter("C:\\PRG2\\PRG2\\Assgt_Aqil Alias\\PRG2_ASSG\\PRG2_ASSG\\queue.csv")) // replace file name with your file path - doesn't work when just "queue.csv" is written
     {
         sw.WriteLine("OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,CreatedDateTime,TotalAmount,Status,Items,PaymentMethod");
 
@@ -1515,7 +1515,7 @@ void SaveQueueAndStack()
     }
 
     // Save stack
-    using (StreamWriter sw = new StreamWriter("stack.csv"))
+    using (StreamWriter sw = new StreamWriter("C:\\PRG2\\PRG2\\Assgt_Aqil Alias\\PRG2_ASSG\\PRG2_ASSG\\stack.csv")) // replace file name with your file path - doesn't work when just "stack.csv" is written
     {
         sw.WriteLine("OrderId,CustomerEmail,RestaurantId,DeliveryDate,DeliveryTime,DeliveryAddress,CreatedDateTime,TotalAmount,Status,Items,PaymentMethod");
 
