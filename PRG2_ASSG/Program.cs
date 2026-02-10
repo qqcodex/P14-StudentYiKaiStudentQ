@@ -9,8 +9,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography;
 
 
 // Global lists and dictionaries
@@ -87,6 +85,10 @@ while (!exit)
     {
         ApplySpecialOffer();
     }
+    else if (choice == "10")
+    {
+        DisplayCustomerOrderHistory();
+    }
     else if (choice == "0")
     {
         SaveQueueAndStack();
@@ -105,6 +107,28 @@ while (!exit)
         Console.Clear();
     }
 }
+
+
+// Display main menu
+void DisplayMainMenu()
+{
+    Console.WriteLine("\n==== Gruberoo Food Delivery System ====");
+    Console.WriteLine("BASIC FEATURES:");
+    Console.WriteLine("[1] List all restaurants and food items");
+    Console.WriteLine("[2] List all orders");
+    Console.WriteLine("[3] Create a new order");
+    Console.WriteLine("[4] Process an order");
+    Console.WriteLine("[5] Modify an existing order");
+    Console.WriteLine("[6] Delete an existing order");
+    Console.WriteLine("\nADVANCED FEATURES:");
+    Console.WriteLine("[7] Bulk process unprocessed orders");
+    Console.WriteLine("[8] Display total order amount");
+    Console.WriteLine("[9] Apply special offer");
+    Console.WriteLine("[10] Customer order history & statistics");
+    Console.WriteLine("[0] Exit");
+    Console.Write("Enter your option: ");
+}
+
 
 // FEATURE 1 - Load restaurants and food items (Q)
 void InitialiseRestaurant()
@@ -311,24 +335,6 @@ void InitialiseOrders()
             Console.WriteLine($"Warning: Error parsing line {i} in orders.csv: {ex.Message}");
         }
     }
-}
-// Display main menu
-void DisplayMainMenu()
-{
-    Console.WriteLine("===== Gruberoo Food Delivery System =====");
-    Console.WriteLine("Basic Features:");
-    Console.WriteLine("1. List all restaurants and menu items");
-    Console.WriteLine("2. List all orders");
-    Console.WriteLine("3. Create a new order");
-    Console.WriteLine("4. Process an order");
-    Console.WriteLine("5. Modify an existing order");
-    Console.WriteLine("6. Delete an existing order");
-    Console.WriteLine("\nAdvanced Features:");
-    Console.WriteLine("7. Bulk process unprocessed orders");
-    Console.WriteLine("8. Display total order amounts and revenue");
-    Console.WriteLine("9. Apply special offer to order (Bonus)");
-    Console.WriteLine("\n0. Exit");
-    Console.Write("Enter your choice: ");
 }
 
 // FEATURE 3 - List all restaurants and menu items (Yi Kai)
@@ -1106,8 +1112,15 @@ void ApplySpecialOffer()
 
     Customer customer = customerMap[custEmail];
 
-    // Display pending orders
-    List<Order> pendingOrders = customer.orderList.Where(o => o.OrderStatus == "Pending").ToList();
+    // Display pending orders using foreach instead of .Where()
+    List<Order> pendingOrders = new List<Order>();
+    foreach (Order o in customer.orderList)
+    {
+        if (o.OrderStatus == "Pending")
+        {
+            pendingOrders.Add(o);
+        }
+    }
 
     if (pendingOrders.Count == 0)
     {
@@ -1131,7 +1144,16 @@ void ApplySpecialOffer()
         return;
     }
 
-    Order targetOrder = pendingOrders.FirstOrDefault(o => o.OrderId == orderId);
+    Order targetOrder = null;
+    foreach (Order o in pendingOrders)
+    {
+        if (o.OrderId == orderId)
+        {
+            targetOrder = o;
+            break;
+        }
+    }
+
     if (targetOrder == null)
     {
         Console.WriteLine("Error: Order not found or not pending.");
@@ -1254,6 +1276,155 @@ void LoadSpecialOffers()
     }
 }
 
+
+
+// ADVANCED FEATURE (d) - Display customer order history and statistics (Yi Kai)
+void DisplayCustomerOrderHistory()
+{
+    Console.WriteLine("Customer Order History & Statistics");
+    Console.WriteLine("===================================\n");
+
+    // Get customer email
+    Console.Write("Enter Customer Email: ");
+    string custEmail = Console.ReadLine().Trim();
+
+    if (!customerMap.ContainsKey(custEmail))
+    {
+        Console.WriteLine("Error: Customer not found.");
+        return;
+    }
+
+    Customer customer = customerMap[custEmail];
+
+    if (customer.orderList.Count == 0)
+    {
+        Console.WriteLine("No orders found for this customer.");
+        return;
+    }
+
+    // Initialize counters
+    int deliveredCount = 0;
+    int pendingCount = 0;
+    int preparingCount = 0;
+    int cancelledCount = 0;
+    int rejectedCount = 0;
+
+    double totalSpent = 0;
+    double pendingValue = 0;
+
+    // Dictionary to count orders per restaurant
+    Dictionary<string, int> restaurantOrderCount = new Dictionary<string, int>();
+
+    // Display header
+    Console.WriteLine($"\nOrder History for {customer.customerName} ({customer.emailAddress})");
+    Console.WriteLine(new string('-', 90));
+    Console.WriteLine($"{"Order ID",-10} {"Restaurant",-30} {"Delivery Date",-20} {"Total",-10} {"Status",-15}");
+    Console.WriteLine(new string('-', 90));
+
+    // Process each order
+    foreach (Order order in customer.orderList)
+    {
+        // Get restaurant info
+        Restaurant rest = null;
+        if (orderToRestaurantMap.ContainsKey(order))
+        {
+            rest = orderToRestaurantMap[order];
+        }
+        string restName = rest != null ? rest.restaurantName : "Unknown";
+
+        // Display order
+        Console.WriteLine($"{order.OrderId,-10} {restName,-30} {order.DeliveryDateTime:dd/MM/yyyy HH:mm}    ${order.OrderTotal,-8:F2} {order.OrderStatus,-15}");
+
+        // Count by status
+        if (order.OrderStatus == "Delivered")
+        {
+            deliveredCount++;
+            totalSpent += order.OrderTotal;
+        }
+        else if (order.OrderStatus == "Pending")
+        {
+            pendingCount++;
+            pendingValue += order.OrderTotal;
+        }
+        else if (order.OrderStatus == "Preparing")
+        {
+            preparingCount++;
+        }
+        else if (order.OrderStatus == "Cancelled")
+        {
+            cancelledCount++;
+        }
+        else if (order.OrderStatus == "Rejected")
+        {
+            rejectedCount++;
+        }
+
+        // Count orders per restaurant
+        if (rest != null)
+        {
+            if (restaurantOrderCount.ContainsKey(restName))
+            {
+                restaurantOrderCount[restName]++;
+            }
+            else
+            {
+                restaurantOrderCount[restName] = 1;
+            }
+        }
+    }
+
+    // Display statistics
+    Console.WriteLine("\n" + new string('=', 90));
+    Console.WriteLine("ORDER STATISTICS");
+    Console.WriteLine(new string('=', 90));
+    Console.WriteLine($"Total Orders Placed: {customer.orderList.Count}");
+
+    Console.WriteLine($"\nBreakdown by Status:");
+    Console.WriteLine($"  Delivered: {deliveredCount}");
+    Console.WriteLine($"  Pending: {pendingCount}");
+    Console.WriteLine($"  Preparing: {preparingCount}");
+    Console.WriteLine($"  Cancelled: {cancelledCount}");
+    Console.WriteLine($"  Rejected: {rejectedCount}");
+
+    Console.WriteLine($"\nFinancial Summary:");
+    Console.WriteLine($"  Total Spent (Delivered Orders): ${totalSpent:F2}");
+
+    if (deliveredCount > 0)
+    {
+        double avgOrder = totalSpent / deliveredCount;
+        Console.WriteLine($"  Average Order Value: ${avgOrder:F2}");
+    }
+    else
+    {
+        Console.WriteLine($"  Average Order Value: $0.00 (No delivered orders)");
+    }
+
+    Console.WriteLine($"  Pending Order Value: ${pendingValue:F2}");
+
+    // Find most frequent restaurant
+    string mostFrequentRest = "";
+    int maxCount = 0;
+
+    foreach (var kvp in restaurantOrderCount)
+    {
+        if (kvp.Value > maxCount)
+        {
+            maxCount = kvp.Value;
+            mostFrequentRest = kvp.Key;
+        }
+    }
+
+    if (!string.IsNullOrEmpty(mostFrequentRest))
+    {
+        Console.WriteLine($"\nMost Ordered Restaurant: {mostFrequentRest} ({maxCount} orders)");
+    }
+
+    Console.WriteLine("\n" + new string('=', 90));
+}
+
+
+
+
 // Save queue and stack on exit
 void SaveQueueAndStack()
 {
@@ -1273,7 +1444,14 @@ void SaveQueueAndStack()
                 string custEmail = cust != null ? cust.emailAddress : "";
                 string restId = rest != null ? rest.restaurantId : "";
 
-                string itemsStr = string.Join("|", o.itemList.Select(i => $"{i.ItemName}, {i.QtyOrdered}"));
+                // Build itemsStr using loop instead of string.Join and LINQ
+                string itemsStr = "";
+                for (int i = 0; i < o.itemList.Count; i++)
+                {
+                    if (i > 0) itemsStr += "|";
+                    itemsStr += o.itemList[i].ItemName + ", " + o.itemList[i].QtyOrdered;
+                }
+
                 sw.WriteLine($"{o.OrderId},{custEmail},{restId},{o.DeliveryDateTime:dd/MM/yyyy},{o.DeliveryDateTime:HH:mm},{o.DeliveryAddress},{o.OrderDateTime:dd/MM/yyyy HH:mm},{o.OrderTotal:F1},{o.OrderStatus},{itemsStr},{o.OrderPaymentMethod}");
             }
         }
@@ -1293,7 +1471,13 @@ void SaveQueueAndStack()
             string custEmail = cust != null ? cust.emailAddress : "";
             string restId = rest != null ? rest.restaurantId : "";
 
-            string itemsStr = string.Join("|", o.itemList.Select(i => $"{i.ItemName}, {i.QtyOrdered}"));
+            string itemsStr = "";
+            for (int i = 0; i < o.itemList.Count; i++)
+            {
+                if (i > 0) itemsStr += "|";
+                itemsStr += o.itemList[i].ItemName + ", " + o.itemList[i].QtyOrdered;
+            }
+
             sw.WriteLine($"{o.OrderId},{custEmail},{restId},{o.DeliveryDateTime:dd/MM/yyyy},{o.DeliveryDateTime:HH:mm},{o.DeliveryAddress},{o.OrderDateTime:dd/MM/yyyy HH:mm},{o.OrderTotal:F1},{o.OrderStatus},{itemsStr},{o.OrderPaymentMethod}");
         }
     }
