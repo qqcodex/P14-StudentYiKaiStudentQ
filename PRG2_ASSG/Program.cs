@@ -1163,7 +1163,7 @@ void DisplayTotalOrderAmount()
 }
 
 
-// ADVANCED FEATURE (c) - Display customer order history and statistics (Yi Kai)
+// BONUS: ADVANCED FEATURE (c) - Display customer order history and statistics (Yi Kai)
 void DisplayCustomerOrderHistory()
 {
     Console.WriteLine("Customer Order History & Statistics");
@@ -1308,7 +1308,7 @@ void DisplayCustomerOrderHistory()
 }
 
 
-// ADVANCED FEATURE (e) - Customer Notifs (Q)
+// BONUS:  ADVANCED FEATURE (d) - Customer Notifications and ETA (Q)
 void DisplayCustomerNotifications()
 {
     Console.WriteLine("Customer Notifications & ETA");
