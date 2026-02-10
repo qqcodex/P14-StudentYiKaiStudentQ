@@ -14,7 +14,6 @@ namespace PRG2_ASSG
 {
     class Order
     {
-        // Only 8 attributes as per class diagram
         public int OrderId { get; set; }
         public DateTime OrderDateTime { get; set; }
         public double OrderTotal { get; set; }

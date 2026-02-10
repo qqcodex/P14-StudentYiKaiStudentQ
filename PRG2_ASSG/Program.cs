@@ -50,7 +50,7 @@ while (!exit)
     string choice = Console.ReadLine();
     Console.WriteLine();
 
-    // Using if-else instead of switch (switch not taught in syllabus)
+    
     if (choice == "1")
     {
         DisplayRestaurantMenuItem();
@@ -106,7 +106,7 @@ while (!exit)
     }
 }
 
-// FEATURE 1 - Load restaurants and food items
+// FEATURE 1 - Load restaurants and food items (Q)
 void InitialiseRestaurant()
 {
     var lines = File.ReadAllLines("restaurants.csv");
@@ -171,7 +171,7 @@ void InitialiseFoodItem()
 }
 
 
-// FEATURE 2 - Load customers and orders
+// FEATURE 2 - Load customers and orders (Yi Kai)
 void InitialiseCustomer()
 {
     var lines = File.ReadAllLines("customers.csv");
@@ -331,7 +331,7 @@ void DisplayMainMenu()
     Console.Write("Enter your choice: ");
 }
 
-// FEATURE 3 - List all restaurants and menu items
+// FEATURE 3 - List all restaurants and menu items (Yi Kai)
 void DisplayRestaurantMenuItem()
 {
     Console.WriteLine("All Restaurants and Menu Items");
@@ -349,7 +349,7 @@ void DisplayRestaurantMenuItem()
     }
 }
 
-// FEATURE 4 - List all orders
+// FEATURE 4 - List all orders (Q)
 void DisplayAllOrders()
 {
     Console.WriteLine("All Orders");
@@ -370,7 +370,7 @@ void DisplayAllOrders()
     }
 }
 
-// FEATURE 5 - Create a new order
+// FEATURE 5 - Create a new order (Yi Kai)
 void CreateNewOrder()
 {
     Console.WriteLine("Create New Order");
@@ -573,7 +573,7 @@ void CreateNewOrder()
     Console.WriteLine($"\nOrder {newOrder.OrderId} created successfully! Status: {newOrder.OrderStatus}");
 }
 
-// FEATURE 6 - Process an order
+// FEATURE 6 - Process an order (Q)
 void ProcessOrder()
 {
     Console.WriteLine("Process Order");
@@ -673,7 +673,7 @@ void ProcessOrder()
     }
 }
 
-// FEATURE 7 - Modify an existing order
+// FEATURE 7 - Modify an existing order (Yi Kai)
 void ModifyOrder()
 {
     Console.WriteLine("Modify Order");
@@ -724,7 +724,7 @@ void ModifyOrder()
     Console.Write("\nModify: [1] Items [2] Address [3] Delivery Time: ");
     string modChoice = Console.ReadLine().Trim();
 
-    // Using if-else instead of switch (switch not taught in syllabus)
+    
     if (modChoice == "1")
     {
         // Modify items
@@ -843,7 +843,7 @@ void ModifyOrder()
 }
 
 
-// FEATURE 8 - Delete an existing order
+// FEATURE 8 - Delete an existing order (Q)
 void DeleteOrder()
 {
     Console.WriteLine("Delete Order");
@@ -919,7 +919,7 @@ void DeleteOrder()
     }
 }
 
-// ADVANCED FEATURE (a) - Bulk processing of unprocessed orders for current day
+// ADVANCED FEATURE (a) - Bulk processing of unprocessed orders for current day (Yi Kai)
 void BulkProcessOrders()
 {
     Console.WriteLine("Bulk Process Unprocessed Orders");
@@ -1001,7 +1001,7 @@ void BulkProcessOrders()
         Console.WriteLine("\nNo orders in the system.");
     }
 }
-// ADVANCED FEATURE (b) - Display total order amount
+// ADVANCED FEATURE (b) - Display total order amount (Q)
 void DisplayTotalOrderAmount()
 {
     Console.WriteLine("Total Order Amounts and Revenue Report");

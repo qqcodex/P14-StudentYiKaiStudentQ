@@ -19,7 +19,6 @@ namespace PRG2_ASSG
 
         public OrderedFoodItem() : base() { }
 
-        // Changed parameter name from 'id' to 'idesc' to match FoodItem constructor
         public OrderedFoodItem(string iname, string idesc, double ip, int qo) : base(iname, idesc, ip)
         {
             QtyOrdered = qo;
