@@ -29,15 +29,27 @@ InitialiseRestaurant();
 InitialiseFoodItem();
 InitialiseCustomer();
 InitialiseOrders();
-LoadSpecialOffers(); // Load special offers for advanced feature
 
 
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurantList.Count} restaurants loaded!");
-int totalFoodItems = restaurantList.Sum(r => r.menuList.Sum(m => m.foodItemList.Count));
+// Count total food items using nested loops instead of LINQ
+int totalFoodItems = 0;
+for (int i = 0; i < restaurantList.Count; i++)
+{
+    for (int j = 0; j < restaurantList[i].menuList.Count; j++)
+    {
+        totalFoodItems += restaurantList[i].menuList[j].foodItemList.Count;
+    }
+}
 Console.WriteLine($"{totalFoodItems} food items loaded!");
 Console.WriteLine($"{customerList.Count} customers loaded!");
-int totalOrders = customerList.Sum(c => c.orderList.Count);
+// Count total orders using loop instead of LINQ
+int totalOrders = 0;
+for (int i = 0; i < customerList.Count; i++)
+{
+    totalOrders += customerList[i].orderList.Count;
+}
 Console.WriteLine($"{totalOrders} orders loaded!\n");
 
 // Main menu loop
@@ -48,7 +60,7 @@ while (!exit)
     string choice = Console.ReadLine();
     Console.WriteLine();
 
-    
+
     if (choice == "1")
     {
         DisplayRestaurantMenuItem();
@@ -83,11 +95,8 @@ while (!exit)
     }
     else if (choice == "9")
     {
-        ApplySpecialOffer();
-    }
-    else if (choice == "10")
-    {
         DisplayCustomerOrderHistory();
+
     }
     else if (choice == "0")
     {
@@ -123,8 +132,7 @@ void DisplayMainMenu()
     Console.WriteLine("\nADVANCED FEATURES:");
     Console.WriteLine("[7] Bulk process unprocessed orders");
     Console.WriteLine("[8] Display total order amount");
-    Console.WriteLine("[9] Apply special offer");
-    Console.WriteLine("[10] Customer order history & statistics");
+    Console.WriteLine("[9] Customer order history & statistics");
     Console.WriteLine("[0] Exit");
     Console.Write("Enter your option: ");
 }
@@ -571,7 +579,13 @@ void CreateNewOrder()
     orderToRestaurantMap[newOrder] = restaurant;
 
     // Append to orders.csv
-    string itemsStr = string.Join("|", newOrder.itemList.Select(i => $"{i.ItemName}, {i.QtyOrdered}"));
+    // Build itemsStr using loop instead of string.Join and LINQ
+    string itemsStr = "";
+    for (int i = 0; i < newOrder.itemList.Count; i++)
+    {
+        if (i > 0) itemsStr += "|";
+        itemsStr += newOrder.itemList[i].ItemName + ", " + newOrder.itemList[i].QtyOrdered;
+    }
     string orderLine = $"{newOrder.OrderId},{custEmail},{restId},{delivDateTime:dd/MM/yyyy},{delivDateTime:HH:mm},{delivAddr},{newOrder.OrderDateTime:dd/MM/yyyy HH:mm},{orderTotal:F1},{newOrder.OrderStatus},{itemsStr},{paymentMethod}";
     File.AppendAllText("orders.csv", "\n" + orderLine);
 
@@ -694,7 +708,15 @@ void ModifyOrder()
     }
 
     Customer customer = customerMap[custEmail];
-    List<Order> pendingOrders = customer.orderList.Where(o => o.OrderStatus == "Pending").ToList();
+    // Get pending orders using foreach instead of .Where()
+    List<Order> pendingOrders = new List<Order>();
+    foreach (Order o in customer.orderList)
+    {
+        if (o.OrderStatus == "Pending")
+        {
+            pendingOrders.Add(o);
+        }
+    }
 
     if (pendingOrders.Count == 0)
     {
@@ -715,7 +737,16 @@ void ModifyOrder()
         return;
     }
 
-    Order targetOrder = pendingOrders.FirstOrDefault(o => o.OrderId == orderId);
+    // Find order using foreach instead of .FirstOrDefault()
+    Order targetOrder = null;
+    foreach (Order o in pendingOrders)
+    {
+        if (o.OrderId == orderId)
+        {
+            targetOrder = o;
+            break;
+        }
+    }
     if (targetOrder == null)
     {
         Console.WriteLine("Error: Order not found or not pending.");
@@ -730,7 +761,7 @@ void ModifyOrder()
     Console.Write("\nModify: [1] Items [2] Address [3] Delivery Time: ");
     string modChoice = Console.ReadLine().Trim();
 
-    
+
     if (modChoice == "1")
     {
         // Modify items
@@ -864,7 +895,15 @@ void DeleteOrder()
     }
 
     Customer customer = customerMap[custEmail];
-    List<Order> pendingOrders = customer.orderList.Where(o => o.OrderStatus == "Pending").ToList();
+    // Get pending orders using foreach instead of .Where()
+    List<Order> pendingOrders = new List<Order>();
+    foreach (Order o in customer.orderList)
+    {
+        if (o.OrderStatus == "Pending")
+        {
+            pendingOrders.Add(o);
+        }
+    }
 
     if (pendingOrders.Count == 0)
     {
@@ -885,7 +924,16 @@ void DeleteOrder()
         return;
     }
 
-    Order targetOrder = pendingOrders.FirstOrDefault(o => o.OrderId == orderId);
+    // Find order using foreach instead of .FirstOrDefault()
+    Order targetOrder = null;
+    foreach (Order o in pendingOrders)
+    {
+        if (o.OrderId == orderId)
+        {
+            targetOrder = o;
+            break;
+        }
+    }
     if (targetOrder == null)
     {
         Console.WriteLine("Error: Order not found or not pending.");
@@ -994,7 +1042,12 @@ void BulkProcessOrders()
     Console.WriteLine($"  - Rejected: {rejectedCount}");
 
     // Calculate total orders in system
-    int totalOrdersInSystem = customerList.Sum(c => c.orderList.Count);
+    // Calculate total orders in system using loop instead of LINQ
+    int totalOrdersInSystem = 0;
+    for (int i = 0; i < customerList.Count; i++)
+    {
+        totalOrdersInSystem += customerList[i].orderList.Count;
+    }
 
     if (totalOrdersInSystem > 0)
     {
@@ -1091,194 +1144,8 @@ void DisplayTotalOrderAmount()
     Console.WriteLine($"  (Commission: ${gruberooCommission:F2} + Delivery Fees: ${totalDeliveryFees:F2})");
 }
 
-// ADVANCED FEATURE (c) - BONUS: Apply special offer to order
-void ApplySpecialOffer()
-{
-    Console.WriteLine("Apply Special Offer to Order");
-    Console.WriteLine("============================\n");
 
-    // First, load special offers if not already loaded
-    LoadSpecialOffers();
-
-    // Get customer email
-    Console.Write("Enter Customer Email: ");
-    string custEmail = Console.ReadLine().Trim();
-
-    if (!customerMap.ContainsKey(custEmail))
-    {
-        Console.WriteLine("Error: Customer not found.");
-        return;
-    }
-
-    Customer customer = customerMap[custEmail];
-
-    // Display pending orders using foreach instead of .Where()
-    List<Order> pendingOrders = new List<Order>();
-    foreach (Order o in customer.orderList)
-    {
-        if (o.OrderStatus == "Pending")
-        {
-            pendingOrders.Add(o);
-        }
-    }
-
-    if (pendingOrders.Count == 0)
-    {
-        Console.WriteLine("No pending orders found for this customer.");
-        return;
-    }
-
-    Console.WriteLine("Pending Orders:");
-    foreach (var order in pendingOrders)
-    {
-        Restaurant rest = orderToRestaurantMap.ContainsKey(order) ? orderToRestaurantMap[order] : null;
-        string restName = rest != null ? rest.restaurantName : "Unknown";
-        Console.WriteLine($"  {order.OrderId} - {restName} - ${order.OrderTotal:F2}");
-    }
-
-    // Get order ID
-    Console.Write("\nEnter Order ID: ");
-    if (!int.TryParse(Console.ReadLine(), out int orderId))
-    {
-        Console.WriteLine("Error: Invalid Order ID.");
-        return;
-    }
-
-    Order targetOrder = null;
-    foreach (Order o in pendingOrders)
-    {
-        if (o.OrderId == orderId)
-        {
-            targetOrder = o;
-            break;
-        }
-    }
-
-    if (targetOrder == null)
-    {
-        Console.WriteLine("Error: Order not found or not pending.");
-        return;
-    }
-
-    // Get restaurant for this order
-    Restaurant restaurant = orderToRestaurantMap.ContainsKey(targetOrder) ? orderToRestaurantMap[targetOrder] : null;
-    if (restaurant == null)
-    {
-        Console.WriteLine("Error: Cannot find restaurant for this order.");
-        return;
-    }
-
-    // Display available special offers for this restaurant
-    if (restaurant.specialOfferList.Count == 0)
-    {
-        Console.WriteLine($"\nNo special offers available for {restaurant.restaurantName}.");
-        return;
-    }
-
-    Console.WriteLine($"\nAvailable Special Offers for {restaurant.restaurantName}:");
-    for (int i = 0; i < restaurant.specialOfferList.Count; i++)
-    {
-        SpecialOffer offer = restaurant.specialOfferList[i];
-        Console.WriteLine($"{i + 1}. {offer.offerCode} - {offer.offerDesc}");
-        if (offer.discount > 0)
-        {
-            Console.WriteLine($"   Discount: {offer.discount}%");
-        }
-    }
-
-    // Select offer
-    Console.Write("\nEnter offer number (0 to cancel): ");
-    if (!int.TryParse(Console.ReadLine(), out int offerNum) || offerNum < 0 || offerNum > restaurant.specialOfferList.Count)
-    {
-        Console.WriteLine("Cancelled.");
-        return;
-    }
-
-    if (offerNum == 0)
-    {
-        Console.WriteLine("Cancelled.");
-        return;
-    }
-
-    SpecialOffer selectedOffer = restaurant.specialOfferList[offerNum - 1];
-
-    // Apply discount
-    double originalTotal = targetOrder.OrderTotal;
-    double discount = 0;
-
-    if (selectedOffer.discount > 0)
-    {
-        // Percentage discount (apply to items only, not delivery fee)
-        double itemsTotal = originalTotal - 5.00; // Subtract delivery fee
-        discount = itemsTotal * (selectedOffer.discount / 100.0);
-        targetOrder.OrderTotal = originalTotal - discount;
-    }
-    else
-    {
-        // Free delivery offer
-        if (selectedOffer.offerDesc.ToLower().Contains("free delivery"))
-        {
-            double itemsTotal = originalTotal - 5.00;
-            if (itemsTotal >= 30) // Only if order is over $30
-            {
-                discount = 5.00;
-                targetOrder.OrderTotal = originalTotal - discount;
-                Console.WriteLine("Free delivery applied! (Order over $30)");
-            }
-            else
-            {
-                Console.WriteLine($"Error: Order must be at least $30 for free delivery. Current: ${itemsTotal:F2}");
-                return;
-            }
-        }
-    }
-
-    Console.WriteLine($"\nSpecial Offer Applied: {selectedOffer.offerCode}");
-    Console.WriteLine($"Original Total: ${originalTotal:F2}");
-    Console.WriteLine($"Discount: -${discount:F2}");
-    Console.WriteLine($"New Total: ${targetOrder.OrderTotal:F2}");
-    Console.WriteLine($"\nOrder {targetOrder.OrderId} updated successfully!");
-}
-
-void LoadSpecialOffers()
-{
-    try
-    {
-        var lines = File.ReadAllLines("specialoffers.csv");
-
-        for (int i = 1; i < lines.Length; i++)
-        {
-            if (string.IsNullOrWhiteSpace(lines[i])) continue;
-
-            string[] data = lines[i].Split(',');
-            if (data.Length < 3) continue;
-
-            string restId = data[0].Trim();
-            string offerCode = data[1].Trim();
-            string offerDesc = data[2].Trim();
-
-            double discount = 0;
-            if (data.Length >= 4 && !string.IsNullOrWhiteSpace(data[3]))
-            {
-                double.TryParse(data[3].Trim(), out discount);
-            }
-
-            if (restaurantMap.ContainsKey(restId))
-            {
-                SpecialOffer offer = new SpecialOffer(offerCode, offerDesc, discount);
-                restaurantMap[restId].AddSpecialOffer(offer);
-            }
-        }
-    }
-    catch (Exception)
-    {
-        // Special offers file might not exist yet
-    }
-}
-
-
-
-// ADVANCED FEATURE (d) - Display customer order history and statistics (Yi Kai)
+// ADVANCED FEATURE (c) - Display customer order history and statistics (Yi Kai)
 void DisplayCustomerOrderHistory()
 {
     Console.WriteLine("Customer Order History & Statistics");
@@ -1484,3 +1351,4 @@ void SaveQueueAndStack()
 
     Console.WriteLine("\nQueue and stack data saved successfully!");
 }
+
