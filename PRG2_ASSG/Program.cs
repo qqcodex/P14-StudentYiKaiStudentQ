@@ -89,6 +89,10 @@ while (!exit)
     {
         DisplayCustomerOrderHistory();
     }
+    else if (choice == "11")
+    {
+        DisplayCustomerNotifications();
+    }
     else if (choice == "0")
     {
         SaveQueueAndStack();
@@ -125,6 +129,7 @@ void DisplayMainMenu()
     Console.WriteLine("[8] Display total order amount");
     Console.WriteLine("[9] Apply special offer");
     Console.WriteLine("[10] Customer order history & statistics");
+    Console.WriteLine("[11] Customer Notifications & ETA");
     Console.WriteLine("[0] Exit");
     Console.Write("Enter your option: ");
 }
@@ -1010,83 +1015,96 @@ void BulkProcessOrders()
 // ADVANCED FEATURE (b) - Display total order amount (Q)
 void DisplayTotalOrderAmount()
 {
+    // Title of the report
     Console.WriteLine("Total Order Amounts and Revenue Report");
     Console.WriteLine("======================================\n");
 
-    const double GRUBEROO_COMMISSION = 0.30; // 30%
-    const double DELIVERY_FEE = 5.00;
+    // Fixed values used for calculation
+    double GRUBEROO_COMMISSION = 0.30; // Gruberoo earns 30% from food sales
+    double DELIVERY_FEE = 5.00;        // Fixed delivery fee per order
 
-    double grandDeliveredFoodSales = 0; // delivered orders total LESS delivery fee
-    double grandTotalRefunds = 0;
+    // Variables to store overall totals across ALL restaurants
+    double grandDeliveredFoodSales = 0; // Total food sales (excluding delivery fees)
+    double grandTotalRefunds = 0;      // Total refunds from all restaurants
+    int grandDeliveredCount = 0;       // Total number of delivered orders
 
-    int grandDeliveredCount = 0;
-
-    // Process each restaurant
+    // Loop through each restaurant in the system
     for (int r = 0; r < restaurantList.Count; r++)
     {
         Restaurant restaurant = restaurantList[r];
 
+        // Display restaurant header
         Console.WriteLine($"\n{restaurant.restaurantName} ({restaurant.restaurantId})");
         Console.WriteLine(new string('-', 50));
 
-        double restaurantDeliveredFoodSales = 0; // (OrderTotal - delivery fee)
-        double restaurantTotalRefunds = 0;
+        // Variables to track this restaurant’s totals
+        double restaurantDeliveredFoodSales = 0; // Food sales only (no delivery fee)
+        double restaurantTotalRefunds = 0;      // Refund total for this restaurant
+        int deliveredCount = 0;                 // Count of delivered orders
+        int refundedCount = 0;                  // Count of refunded orders
 
-        int deliveredCount = 0;
-        int refundedCount = 0;
-
-        // Loop through all orders mapped to restaurants
+        // Loop through all orders stored in the restaurant mapping dictionary
         foreach (KeyValuePair<Order, Restaurant> kvp in orderToRestaurantMap)
         {
             Order order = kvp.Key;
             Restaurant mappedRestaurant = kvp.Value;
 
+            // Skip orders that do not belong to the current restaurant
             if (mappedRestaurant.restaurantId != restaurant.restaurantId)
                 continue;
 
-            // Successful orders (Delivered)
+            // If the order was successfully delivered
             if (order.OrderStatus == "Delivered")
             {
-                // Requirement: total order amount LESS delivery fee per order
+                // Remove delivery fee to get only the food sales portion
                 double foodPart = order.OrderTotal - DELIVERY_FEE;
-                if (foodPart < 0) foodPart = 0; // safety, in case of weird data
 
+                // Safety check to prevent negative values
+                if (foodPart < 0)
+                {
+                    foodPart = 0;
+                }
+
+                // Add to this restaurant’s delivered food sales
                 restaurantDeliveredFoodSales += foodPart;
                 deliveredCount++;
             }
-            // Refunded orders
+            // If the order was rejected or cancelled (refunded)
             else if (order.OrderStatus == "Rejected" || order.OrderStatus == "Cancelled")
             {
+                // Add full order amount to refund total
                 restaurantTotalRefunds += order.OrderTotal;
                 refundedCount++;
             }
         }
 
+        // Display this restaurant’s results
         Console.WriteLine($"Delivered Orders: {deliveredCount}");
         Console.WriteLine($"  Total Order Amount (less delivery fee): ${restaurantDeliveredFoodSales:F2}");
 
         Console.WriteLine($"\nRefunded Orders: {refundedCount}");
         Console.WriteLine($"  Total Refunds: ${restaurantTotalRefunds:F2}");
 
+        // Add this restaurant’s values to the overall totals
         grandDeliveredFoodSales += restaurantDeliveredFoodSales;
         grandTotalRefunds += restaurantTotalRefunds;
         grandDeliveredCount += deliveredCount;
     }
 
-    // Display grand totals
+    // Display overall summary for all restaurants
     Console.WriteLine("\n" + new string('=', 50));
     Console.WriteLine("OVERALL SUMMARY");
     Console.WriteLine(new string('=', 50));
     Console.WriteLine($"Total Order Amount (less delivery fee): ${grandDeliveredFoodSales:F2}");
     Console.WriteLine($"Total Refunds: ${grandTotalRefunds:F2}");
 
-    // Final amount Gruberoo earns:
-    // - 30% commission on delivered FOOD sales (excluding delivery fee)
-    // - plus all delivery fees from delivered orders
+    // Calculate Gruberoo's final earnings
+    // Earnings = 30% commission from food sales + all delivery fees
     double totalDeliveryFees = grandDeliveredCount * DELIVERY_FEE;
     double gruberooCommission = grandDeliveredFoodSales * GRUBEROO_COMMISSION;
     double finalGruberooEarnings = gruberooCommission + totalDeliveryFees;
 
+    // Display Gruberoo earnings breakdown
     Console.WriteLine($"\nFinal Amount Gruberoo Earns: ${finalGruberooEarnings:F2}");
     Console.WriteLine($"  (Commission: ${gruberooCommission:F2} + Delivery Fees: ${totalDeliveryFees:F2})");
 }
@@ -1423,6 +1441,173 @@ void DisplayCustomerOrderHistory()
 }
 
 
+// ADVANCED FEATURE (e) - Customer Notifs (Q)
+void DisplayCustomerNotifications()
+{
+    Console.WriteLine("Customer Notifications & ETA");
+    Console.WriteLine("============================\n");
+
+    // Step 1: Ask for customer email
+    Console.Write("Enter Customer Email: ");
+    string custEmail = Console.ReadLine().Trim();
+
+    // Step 2: Validate customer exists
+    if (!customerMap.ContainsKey(custEmail))
+    {
+        Console.WriteLine("Error: Customer not found.");
+        return;
+    }
+
+    Customer customer = customerMap[custEmail];
+
+    // Step 3: Check if customer has any orders
+    if (customer.orderList.Count == 0)
+    {
+        Console.WriteLine("No orders found for this customer.");
+        return;
+    }
+
+    // Step 4: Collect only active orders (Pending or Preparing)
+    List<Order> activeOrders = new List<Order>();
+
+    for (int i = 0; i < customer.orderList.Count; i++) // Loop through ALL orders the customer has made
+    {
+        string status = customer.orderList[i].OrderStatus; // Get the status of the current order
+
+        if (status == "Pending" || status == "Preparing") //condition of orders to add into activeOrders 
+        {
+            activeOrders.Add(customer.orderList[i]);
+        }
+    }
+
+    // Step 5: If no active orders
+    if (activeOrders.Count == 0)
+    {
+        Console.WriteLine("No active orders (Pending/Preparing) found.");
+        return;
+    }
+
+    // Step 6: Print table header
+    Console.WriteLine($"\nActive Orders for {customer.customerName} ({customer.emailAddress})");
+    Console.WriteLine(new string('-', 100));
+    Console.WriteLine($"{"Order ID",-10} {"Restaurant",-25} {"Delivery Time",-20} {"Status",-12} {"ETA(min)",-10} {"Urgency",-10}");
+    Console.WriteLine(new string('-', 100));
+
+    // Counters for summary statistics
+    int pendingCount = 0;
+    int preparingCount = 0;
+    int urgentCount = 0;
+    int overdueCount = 0;
+
+    // Step 7: Loop through each active order
+    for (int i = 0; i < activeOrders.Count; i++)
+    {
+        Order order = activeOrders[i];
+
+        // Step 7A: Find restaurant of this order using mapping dictionary
+        Restaurant rest = null;
+
+        if (orderToRestaurantMap.ContainsKey(order))
+        {
+            rest = orderToRestaurantMap[order];
+        }
+
+        // Step 7B: Get restaurant name safely (no ternary)
+        string restName; // declare variable to store restaurant name 
+
+        if (rest != null)
+        {
+            restName = rest.restaurantName; // if found, store the actual name 
+        }
+        else
+        {
+            restName = "Unknown";
+        }
+
+        // Step 7C: Calculate ETA in minutes
+        TimeSpan diff = order.DeliveryDateTime - DateTime.Now;
+        int etaMins = (int)Math.Round(diff.TotalMinutes);
+
+        // Step 7D: Determine urgency label
+        string urgency = "";
+
+        if (etaMins < 0)
+        {
+            urgency = "OVERDUE";
+            overdueCount++;
+        }
+        else if (etaMins < 60)
+        {
+            urgency = "URGENT";
+            urgentCount++;
+        }
+        else if (etaMins <= 180)
+        {
+            urgency = "SOON";
+        }
+        else
+        {
+            urgency = "SCHEDULED";
+        }
+
+        // Step 7E: Count order status
+        if (order.OrderStatus == "Pending")
+        {
+            pendingCount++;
+        }
+        else if (order.OrderStatus == "Preparing")
+        {
+            preparingCount++;
+        }
+
+        // Step 7F: Display order row
+        Console.WriteLine($"{order.OrderId,-10} {restName,-25} {order.DeliveryDateTime,-20:dd/MM/yyyy HH:mm} {order.OrderStatus,-12} {etaMins,-10} {urgency,-10}");
+
+        // Step 7G: Simulated notification message
+        Console.WriteLine("  Notification:");
+
+        if (order.OrderStatus == "Pending")
+        {
+            Console.WriteLine($"  \"Your order {order.OrderId} is pending confirmation by {restName}.\"");
+        }
+        else if (order.OrderStatus == "Preparing")
+        {
+            if (etaMins < 0)
+            {
+                Console.WriteLine($"  \"Your order {order.OrderId} may be delayed. Please contact support if needed.\"");
+            }
+            else
+            {
+                Console.WriteLine($"  \"Good news! {restName} is preparing your order {order.OrderId}. Estimated arrival in {etaMins} minutes.\"");
+            }
+        }
+
+        Console.WriteLine(); // spacing between orders
+    }
+
+    // Step 8: Summary statistics (like your friend's feature style)
+    Console.WriteLine(new string('=', 100));
+    Console.WriteLine("NOTIFICATION SUMMARY");
+    Console.WriteLine(new string('=', 100));
+    Console.WriteLine($"Total Active Orders: {activeOrders.Count}");
+    Console.WriteLine($" Pending: {pendingCount}");
+    Console.WriteLine($" Preparing: {preparingCount}");
+    Console.WriteLine(new string('=', 10));
+    Console.WriteLine($"Urgent (< 60 mins): {urgentCount}");
+    Console.WriteLine($"Overdue: {overdueCount}");
+
+    // Step 9: Suggestion message
+    if (overdueCount > 0)
+    {
+        Console.WriteLine("\nSuggestion: Some orders are overdue. Consider contacting the restaurant or support.");
+    }
+    else if (urgentCount > 0)
+    {
+        Console.WriteLine("\nSuggestion: Urgent orders are arriving soon. Ensure someone is available to receive them.");
+    }
+
+    Console.WriteLine(new string('=', 100));
+}
 
 
 // Save queue and stack on exit
