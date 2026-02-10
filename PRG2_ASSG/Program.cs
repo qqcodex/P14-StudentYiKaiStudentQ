@@ -615,28 +615,28 @@ void ProcessOrder()
     Console.Write("Enter Restaurant ID: ");
     string rId = Console.ReadLine().Trim();
 
-    if (!restaurantMap.ContainsKey(rId))
+    if (!restaurantMap.ContainsKey(rId)) //check if rid exist in system 
     {
         Console.WriteLine("Error: Restaurant not found.");
         return;
     }
 
-    Restaurant restaurant = restaurantMap[rId];
+    Restaurant restaurant = restaurantMap[rId]; //retrieve restaurant object
 
-    if (restaurant.orderQueue.Count == 0)
+    if (restaurant.orderQueue.Count == 0) //check if restaurant has any orders in its queue
     {
         Console.WriteLine("No orders to process for this restaurant.");
         return;
     }
 
-    // Create temporary queue to process orders
+    // Create temporary queue to hold orders after processing
     Queue<Order> tempQueue = new Queue<Order>();
 
-    while (restaurant.orderQueue.Count > 0)
+    while (restaurant.orderQueue.Count > 0) // process all orders in restaurant queue
     {
-        Order current = restaurant.orderQueue.Dequeue();
+        Order current = restaurant.orderQueue.Dequeue(); //remove first order from queue 
 
-        // Find customer for this order
+        // Find customer for this order using mapping dict
         Customer customer = orderToCustomerMap.ContainsKey(current) ? orderToCustomerMap[current] : null;
         string customerName = customer != null ? customer.customerName : "Unknown";
 
@@ -651,11 +651,11 @@ void ProcessOrder()
         Console.Write("\n[C]onfirm / [R]eject / [S]kip / [D]eliver: ");
         string option = Console.ReadLine().Trim();
 
-        if (option == "C")
+        if (option == "C") //cfm order if still pending 
         {
             if (current.OrderStatus == "Pending")
             {
-                current.OrderStatus = "Preparing";
+                current.OrderStatus = "Preparing"; //update status 
                 Console.WriteLine($"\nOrder {current.OrderId} confirmed. Status: Preparing");
             }
             else
@@ -663,7 +663,7 @@ void ProcessOrder()
                 Console.WriteLine($"Error: Can only confirm orders with 'Pending' status.");
             }
         }
-        else if (option == "R")
+        else if (option == "R") //reject order and push into refund stack 
         {
             if (current.OrderStatus == "Pending")
             {
@@ -676,11 +676,11 @@ void ProcessOrder()
                 Console.WriteLine($"Error: Can only reject orders with 'Pending' status.");
             }
         }
-        else if (option == "S")
+        else if (option == "S") //skip - no changes made 
         {
             Console.WriteLine($"\nOrder {current.OrderId} skipped.");
         }
-        else if (option == "D")
+        else if (option == "D") //deliver the order (only if its Preparing)
         {
             if (current.OrderStatus == "Preparing")
             {
@@ -692,12 +692,12 @@ void ProcessOrder()
                 Console.WriteLine($"Error: Can only deliver orders with 'Preparing' status.");
             }
         }
-        else
+        else //handle invalid input
         {
             Console.WriteLine("Error: Invalid option. Please enter 'C', 'R', 'S', or 'D' only. Order skipped.");
         }
 
-        tempQueue.Enqueue(current);
+        tempQueue.Enqueue(current); //restore all ordrs back into restaurant main queue 
     }
 
     // Restore queue
