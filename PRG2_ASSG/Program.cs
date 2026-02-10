@@ -33,7 +33,7 @@ InitialiseOrders();
 
 Console.WriteLine("Welcome to the Gruberoo Food Delivery System");
 Console.WriteLine($"{restaurantList.Count} restaurants loaded!");
-// Count total food items using nested loops instead of LINQ
+
 int totalFoodItems = 0;
 for (int i = 0; i < restaurantList.Count; i++)
 {
@@ -44,7 +44,7 @@ for (int i = 0; i < restaurantList.Count; i++)
 }
 Console.WriteLine($"{totalFoodItems} food items loaded!");
 Console.WriteLine($"{customerList.Count} customers loaded!");
-// Count total orders using loop instead of LINQ
+
 int totalOrders = 0;
 for (int i = 0; i < customerList.Count; i++)
 {
@@ -259,7 +259,7 @@ void InitialiseOrders()
                 currentField += c;
             }
         }
-        data.Add(currentField); // Add last field
+        data.Add(currentField); 
 
         if (data.Count < 11)
         {
@@ -510,8 +510,6 @@ void CreateNewOrder()
         {
             Console.Write("Enter special request: ");
             string specialRequest = Console.ReadLine().Trim();
-            // Note: Special request would be stored if Order class had that attribute
-            // For now, we acknowledge it but can't store it per class diagram
             break;
         }
         else if (specialReqChoice == "N")
@@ -579,7 +577,6 @@ void CreateNewOrder()
     orderToRestaurantMap[newOrder] = restaurant;
 
     // Append to orders.csv
-    // Build itemsStr using loop instead of string.Join and LINQ
     string itemsStr = "";
     for (int i = 0; i < newOrder.itemList.Count; i++)
     {
@@ -708,7 +705,6 @@ void ModifyOrder()
     }
 
     Customer customer = customerMap[custEmail];
-    // Get pending orders using foreach instead of .Where()
     List<Order> pendingOrders = new List<Order>();
     foreach (Order o in customer.orderList)
     {
@@ -737,7 +733,7 @@ void ModifyOrder()
         return;
     }
 
-    // Find order using foreach instead of .FirstOrDefault()
+    
     Order targetOrder = null;
     foreach (Order o in pendingOrders)
     {
@@ -895,7 +891,6 @@ void DeleteOrder()
     }
 
     Customer customer = customerMap[custEmail];
-    // Get pending orders using foreach instead of .Where()
     List<Order> pendingOrders = new List<Order>();
     foreach (Order o in customer.orderList)
     {
@@ -924,7 +919,7 @@ void DeleteOrder()
         return;
     }
 
-    // Find order using foreach instead of .FirstOrDefault()
+
     Order targetOrder = null;
     foreach (Order o in pendingOrders)
     {
@@ -1042,7 +1037,6 @@ void BulkProcessOrders()
     Console.WriteLine($"  - Rejected: {rejectedCount}");
 
     // Calculate total orders in system
-    // Calculate total orders in system using loop instead of LINQ
     int totalOrdersInSystem = 0;
     for (int i = 0; i < customerList.Count; i++)
     {
@@ -1311,7 +1305,6 @@ void SaveQueueAndStack()
                 string custEmail = cust != null ? cust.emailAddress : "";
                 string restId = rest != null ? rest.restaurantId : "";
 
-                // Build itemsStr using loop instead of string.Join and LINQ
                 string itemsStr = "";
                 for (int i = 0; i < o.itemList.Count; i++)
                 {
