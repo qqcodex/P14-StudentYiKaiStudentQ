@@ -1,7 +1,8 @@
 ﻿//==========================================================
-// Student Number : S10272951
-// Student Name : Dg Muhammad Aqil Bin Md Alias
-// Partner Name : Tan Yi Kai
+// Student Number: S10272698F
+// Student Name : Tan Yi Kai
+// Partner Number : S10272951
+// Partner Name : Dg Muhammad Aqil Bin Md Alias
 //==========================================================
 
 using System;
